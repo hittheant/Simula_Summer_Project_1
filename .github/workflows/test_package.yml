@@ -33,8 +33,9 @@ jobs:
   test-code:
     # This code depends on the result of check-code
     needs: check-code
+    runs-on: ubuntu-22.04
     container: ghcr.io/scientificcomputing/fenics:2023-01-16
-   
+    
     steps:
 
       - uses: actions/checkout@v3
