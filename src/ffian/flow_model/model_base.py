@@ -62,7 +62,6 @@ class ModelBase():
 
         # membrane parameters
         gamma_m = df.Constant(8.0e6)       # area volume ratio [1/m]
-        C_m = df.Constant(1.0e-2)          # capacitance [F/m^2]
         K_m = df.Constant(2.294e3)         # membrane stiffness [Pa]
         g_Na = df.Constant(1.0)            # sodium conductance [S/m^2]
         g_Cl = df.Constant(0.5)            # chloride conductance [S/m^2]
@@ -86,7 +85,7 @@ class ModelBase():
 
         # gather physical parameters
         params = {'temperature': temperature, 'F': F, 'R': R,
-                  'gamma_m': gamma_m, 'C_m': C_m, 'K_m': K_m,
+                  'gamma_m': gamma_m, 'K_m': K_m,
                   'D': D, 'z': z,
                   'lambdas': lambdas,
                   'g_Na': g_Na, 'g_Cl': g_Cl, 'g_K': g_K,
