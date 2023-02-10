@@ -42,7 +42,7 @@ class Solver():
         # define function space
         CG1 = df.FiniteElement('CG', self.mesh.ufl_cell(), 1)
         R = df.FiniteElement("R", self.mesh.ufl_cell(), 0)
-        elements = [CG1]*(self.N_unknowns - 1) + [R]
+        elements = [CG1]*(self.N_unknowns - 1) + [R]  # for Lagr. mutliplier
 
         ME = df.MixedElement(elements)                         # mixed element
         self.W = df.FunctionSpace(self.mesh, ME)               # function space
@@ -154,13 +154,13 @@ class Solver():
             u_e = - kappa[1]*df.grad(p_e)
         elif self.model.model_v == 'M2':
             u_i = - kappa[0]*(df.grad(p_i)
-                              - R*temperature*df.grad(a_i/alpha_i))
+                    - R*temperature*df.grad(a_i/alpha_i))
             u_e = - kappa[1]*df.grad(p_e)
         elif self.model.model_v == 'M3':
             u_i = - kappa[0]*(df.grad(p_i)
-                              - R*temperature*df.grad(a_i/alpha_i))
+                    - R*temperature*df.grad(a_i/alpha_i))
             u_e = - kappa[1]*df.grad(p_e) \
-                  - eps_r*eps_zero*zeta*df.grad(phi_e)/mu
+                    - eps_r*eps_zero*zeta*df.grad(phi_e)/mu
         else:
             print('model_v must be "M1", "M2", or "M3"')
             sys.exit(0)
@@ -207,24 +207,24 @@ class Solver():
 
             # form for conservation of ion n in ICS
             A_k_i += 1.0/(self.dt*gamma_m)*df.inner(alpha_i*k_i
-                        - alpha_i_*k_i_, v_k_i)*df.dx \
-                        - 1.0/gamma_m*df.inner(alpha_i*j_i, df.grad(v_k_i))*df.dx \
-                        + df.inner(j_m[n], v_k_i)*df.dx
+                       - alpha_i_*k_i_, v_k_i)*df.dx \
+                       - 1.0/gamma_m*df.inner(alpha_i*j_i, df.grad(v_k_i))*df.dx \
+                       + df.inner(j_m[n], v_k_i)*df.dx
 
             # form for conservation of ion n in ECS
             A_k_e += 1.0/(self.dt*gamma_m)*df.inner(alpha_e*k_e
-                        - alpha_e_*k_e_, v_k_e)*df.dx \
-                        - 1.0/gamma_m*df.inner(alpha_e*j_e, df.grad(v_k_e))*df.dx \
-                        - df.inner(j_m[n], v_k_e)*df.dx \
-                        - df.inner(j_in[n], v_k_e)*df.dx
+                       - alpha_e_*k_e_, v_k_e)*df.dx \
+                       - 1.0/gamma_m*df.inner(alpha_e*j_e, df.grad(v_k_e))*df.dx \
+                       - df.inner(j_m[n], v_k_e)*df.dx \
+                       - df.inner(j_in[n], v_k_e)*df.dx
 
             # add ion specific part to form for ICS potential
             A_phi_i += - df.inner(z[n]*alpha_i*j_i, df.grad(v_phi_i))*df.dx \
-                        + gamma_m*df.inner(z[n]*j_m[n], v_phi_i)*df.dx
+                         + gamma_m*df.inner(z[n]*j_m[n], v_phi_i)*df.dx
 
             # add ion specific part to form for ECS potential
             A_phi_e += - df.inner(z[n]*alpha_e*j_e, df.grad(v_phi_e))*df.dx \
-                        - gamma_m*df.inner(z[n]*j_m[n], v_phi_e)*df.dx
+                         - gamma_m*df.inner(z[n]*j_m[n], v_phi_e)*df.dx
 
             # add contribution from ions to water flux
             w_m += (k_e - k_i)*(R*temperature)
@@ -245,15 +245,15 @@ class Solver():
         bcs = [df.DirichletBC(self.W.sub(self.N_unknowns-2), df.Constant(0.0), point)]
 
         # initiate solver
-        J = df.derivative(self.A, self.w)                               # Jacobian
-        model = df.NonlinearVariationalProblem(self.A, self.w, bcs, J)  # model
-        self.PDE_solver = df.NonlinearVariationalSolver(model)          # solver
-        prm = self.PDE_solver.parameters                    # parameters
+        J = df.derivative(self.A, self.w)
+        model = df.NonlinearVariationalProblem(self.A, self.w, bcs, J)
+        self.PDE_solver = df.NonlinearVariationalSolver(model)
+        prm = self.PDE_solver.parameters
 
-        prm['newton_solver']['absolute_tolerance'] = 1E-14  # absolute tolerance
-        prm['newton_solver']['relative_tolerance'] = 1E-4   # relative tolerance
-        prm['newton_solver']['maximum_iterations'] = 10     # max iterations
-        prm['newton_solver']['relaxation_parameter'] = 1.0  # relaxation parameter
+        prm['newton_solver']['absolute_tolerance'] = 1E-14
+        prm['newton_solver']['relative_tolerance'] = 1E-4
+        prm['newton_solver']['maximum_iterations'] = 10
+        prm['newton_solver']['relaxation_parameter'] = 1.0
 
         return
 

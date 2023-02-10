@@ -172,7 +172,7 @@ class ModelBase():
         z_Na = self.params['z'][0]
         g_Na = self.params['g_Na']
 
-        # define and return flux (mol/(m^2s)) 
+        # define and return flux (mol/(m^2s))
         j = g_Na*(phi_m - E_Na)/(F*z_Na)
 
         return j
@@ -185,7 +185,7 @@ class ModelBase():
         z_Cl = self.params['z'][2]
         g_Cl = self.params['g_Cl']
 
-        # define and return flux (mol/(m^2*s)) 
+        # define and return flux (mol/(m^2*s))
         j = g_Cl*(phi_m - E_Cl)/(F*z_Cl)
 
         return j
@@ -211,28 +211,28 @@ class ModelBase():
         D = 1 + df.exp(-(0.1186 + phi_m)/0.0441)                   # shorthand
         f_Kir = df.sqrt(K_e/K_e_init)*(A*B)/(C*D)
 
-        # define and return flux (mol/(m^2*s)) 
+        # define and return flux (mol/(m^2*s))
         j = g_K*f_Kir*(phi_m - E_K)/(F*z_K)
-        
+
         return j
 
     def j_pump(self, K_e, Na_i):
         """ Na/K-pump flux"""
-        
+
         # get parameters
         rho_pump = self.params['rho_pump']
         P_Nai = self.params['P_Nai']
         P_Ke = self.params['P_Ke']
 
-        # define and return flux 
-        j = rho_pump*((Na_i**1.5 / (Na_i**1.5 + P_Nai**1.5)) \
-                * (K_e / (K_e + P_Ke))) # [mol/(m^2s)]
-        
-        return j 
+        # define and return flux [mol/(m^2s)]
+        j = rho_pump*((Na_i**1.5 / (Na_i**1.5 + P_Nai**1.5))
+                * (K_e / (K_e + P_Ke)))
+
+        return j
 
     def set_membrane_fluxes(self, w):
         """ Set the transmembrane ion fluxes. """
-        
+
         # get parameters
         F = self.params['F']
         R = self.params['R']
@@ -243,15 +243,15 @@ class ModelBase():
 
         # split unknowns
         Na_i, Na_e, K_i, K_e, Cl_i, Cl_e, \
-                phi_i, phi_e, c = df.split(w)
+            phi_i, phi_e, c = df.split(w)
 
         # membrane potential
         phi_m = phi_i - phi_e
 
-        # reversal potentials 
-        E_Na = R*temperature/(F*z_Na)*df.ln(Na_e/Na_i) # sodium [V]
-        E_K = R*temperature/(F*z_K)*df.ln(K_e/K_i)     # potassium [V]
-        E_Cl = R*temperature/(F*z_Cl)*df.ln(Cl_e/Cl_i) # chloride [V]
+        # reversal potentials
+        E_Na = R*temperature/(F*z_Na)*df.ln(Na_e/Na_i)  # sodium [V]
+        E_K = R*temperature/(F*z_K)*df.ln(K_e/K_i)      # potassium [V]
+        E_Cl = R*temperature/(F*z_Cl)*df.ln(Cl_e/Cl_i)  # chloride [V]
 
         # membrane fluxes
         j_leak_Na = self.j_leak_Na(phi_m, E_Na)
@@ -281,7 +281,7 @@ class ModelBase():
 
         j_in = [j_in_Na, j_in_K, j_in_Cl]
 
-        # set the input fluxes (mol/(m^2s))
+        # set the input fluxes [mol/(m^2s)]
         self.input_fluxes = j_in
 
         return

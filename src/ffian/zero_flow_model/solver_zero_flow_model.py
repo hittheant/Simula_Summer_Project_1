@@ -1,15 +1,8 @@
-from __future__ import print_function
+import dolfin as df
 
-from dolfin import *
-import ufl
-
-import numpy as np
-import os
-import sys
-import subprocess
 
 class Solver():
-    """ Class for solving the zero-flow model used in Sætra et al. 2023 
+    """ Class for solving the zero-flow model used in Sætra et al. 2023
         with unknowns w = (k_r, phi_r_) where:
 
         k_r     - concentration of ion species k in compartment r
@@ -17,16 +10,16 @@ class Solver():
 
     def __init__(self, model, dt_value, Tstop):
         """ Initialize solver """
-        
+
         # time variables
-        self.dt = Constant(dt_value)       # time step
-        self.Tstop = Tstop                 # end time
+        self.dt = df.Constant(dt_value)     # time step
+        self.Tstop = Tstop                  # end time
 
         # get model
-        self.model = model                 # model
-        self.mesh = model.mesh             # mesh
-        self.N_ions = model.N_ions         # number of ions 
-        self.N_comparts = model.N_comparts # number of compartments
+        self.model = model                  # model
+        self.mesh = model.mesh              # mesh
+        self.N_ions = model.N_ions          # number of ions
+        self.N_comparts = model.N_comparts  # number of compartments
 
         # create function spaces
         self.setup_function_spaces()
@@ -38,31 +31,31 @@ class Solver():
 
     def setup_function_spaces(self):
         """ Create function spaces for PDE solver """
-        
-        N_comparts = self.N_comparts                      # number of compartments
-        N_ions = self.N_ions                              # number of ions
-        self.N_unknowns = N_comparts*(1 + N_ions) + 1     # number of unknowns
+
+        N_comparts = self.N_comparts                   # number of compartments
+        N_ions = self.N_ions                           # number of ions
+        self.N_unknowns = N_comparts*(1 + N_ions) + 1  # number of unknowns
 
         # define function space
-        CG1 = FiniteElement('CG', self.mesh.ufl_cell(), 1)         # CG1 element
-        R = FiniteElement("R", self.mesh.ufl_cell(), 0)            # element for Lagrange multiplier
-        elements = [CG1]*(self.N_unknowns - 1) + [R]               # elements
+        CG1 = df.FiniteElement('CG', self.mesh.ufl_cell(), 1)
+        R = df.FiniteElement("R", self.mesh.ufl_cell(), 0)  # for Lagr. multip.
+        elements = [CG1]*(self.N_unknowns - 1) + [R]
 
-        ME = MixedElement(elements)                                # mixed element
-        self.W = FunctionSpace(self.mesh, ME)                      # function space
+        ME = df.MixedElement(elements)                      # mixed element
+        self.W = df.FunctionSpace(self.mesh, ME)            # function space
 
         # initial conditions
         inits_PDE = self.model.inits_PDE
-        self.w_ = interpolate(inits_PDE, self.W)
+        self.w_ = df.interpolate(inits_PDE, self.W)
 
         # unknowns (use initial conditions as guess in Newton solver)
-        self.w = interpolate(inits_PDE, self.W)
-        
+        self.w = df.interpolate(inits_PDE, self.W)
+
         return
 
     def PDE_solver(self):
         """ Create variational formulation for PDEs """
-        
+
         # get parameters
         params = self.model.params
         # get number of compartments and ions
@@ -70,37 +63,35 @@ class Solver():
         N_ions = self.model.N_ions
 
         # physical parameters
-        temperature = params['temperature'] # temperature
-        F = params['F']                     # Faraday's constant
-        R = params['R']                     # gas constant
+        temperature = params['temperature']  # temperature
+        F = params['F']                      # Faraday's constant
+        R = params['R']                      # gas constant
 
         # membrane parameters
-        gamma_m = params['gamma_m']         # membrane area per unit volume of tissue 
-        C_m = params['C_m']                 # membrane area per unit volume of tissue 
+        gamma_m = params['gamma_m']         # are to volume ratio
 
         # ion specific parameters
         z = params['z']                     # valence of ions
-        D = params['D']                     # diffusion coefficients 
+        D = params['D']                     # diffusion coefficients
 
         # compartmental parameters
         alpha_i = params['alpha_i']         # volume fraction - ICS
         alpha_e = params['alpha_e']         # volume fraction - ECS
-        a = params['a']                     # amount of immobile ions 
         lambda_i = params['lambdas'][0]     # turtuosity - ICS
         lambda_e = params['lambdas'][1]     # turtuosity - ECS
 
         # split function for unknown solution in current step n+1
-        ww = split(self.w)
+        ww = df.split(self.w)
         # split function for known solution in previous time step n
-        ww_ = split(self.w_)
+        ww_ = df.split(self.w_)
         # define test functions
-        vv = TestFunctions(self.W)
+        vv = df.TestFunctions(self.W)
 
         # set transmembrane ion fluxes
         self.model.set_membrane_fluxes(self.w)
         # get transmembrane ion fluxes
         j_m = self.model.membrane_fluxes
-        
+
         # set the input/output ion fluxes
         self.model.set_input_fluxes(self.w)
         # get the input/output ion fluxes
@@ -114,26 +105,21 @@ class Solver():
         A_lag = 0              # for Lagrange multiplier
 
         # shorthands
-        a_i = a[0]             # amount of immobile ions ICS
-        a_e = a[1]             # amount of immobile ions ECS
-        
         phi_i = ww[-3]             # ICS potential
         v_phi_i = vv[-3]           # test function for ICS potential
-        phi_i_ = ww_[-3]           # ICS potential from previous time step
-        phi_e = ww[-2]             # ECS potential 
-        v_phi_e = vv[-2]           # test function for ECS potential 
-        phi_e_ = ww_[-2]           # ECS potential from previous time step
-        
-        c = ww[-1]                 # Lagrange multiplier 
-        d = vv[-1]                 # test function for Lagrange multiplier 
+        phi_e = ww[-2]             # ECS potential
+        v_phi_e = vv[-2]           # test function for ECS potential
+
+        c = ww[-1]                 # Lagrange multiplier
+        d = vv[-1]                 # test function for Lagrange multiplier
 
         # add terms from constraint (Lagrange multiplier)
-        A_phi_e += c*v_phi_e*dx
-        A_lag += phi_e*d*dx
+        A_phi_e += c*v_phi_e*df.dx
+        A_lag += phi_e*d*df.dx
 
         # variational formulations for ions and potentials
         for n in range(N_ions):
-            # index for ion n 
+            # index for ion n
             index_i = N_comparts*(n + 1) - 2
             index_e = N_comparts*(n + 2) - 3
             # shorthands ICS
@@ -148,42 +134,46 @@ class Solver():
             D_e = D[n]/lambda_e**2     # effective diffusion coefficients ECS
 
             # ICS ion flux for ion n - (mol/m^2*s)
-            j_i = - D_i*(grad(k_i) + z[n]*F*k_i/(R*temperature)*grad(phi_i))
+            j_i = - D_i*(df.grad(k_i)
+                        + z[n]*F*k_i/(R*temperature)*df.grad(phi_i))
 
             # ECS ion flux for ion n - (mol/m^2*s)
-            j_e = - D_e*(grad(k_e) + z[n]*F*k_e/(R*temperature)*grad(phi_e))
+            j_e = - D_e*(df.grad(k_e)
+                        + z[n]*F*k_e/(R*temperature)*df.grad(phi_e))
 
             # form for conservation of ion n in ICS
-            A_k_i += 1.0/self.dt*inner(k_i - k_i_, v_k_i)*dx \
-                   - inner(j_i, grad(v_k_i))*dx \
-                   + (gamma_m/alpha_i)*inner(j_m[n], v_k_i)*dx
-            
-            # form for conservation of ion n in ECS 
-            A_k_e += 1.0/self.dt*inner(k_e - k_e_, v_k_e)*dx \
-                     - inner(j_e, grad(v_k_e))*dx \
-                     - (gamma_m/alpha_e)*inner(j_m[n], v_k_e)*dx \
-                     - (gamma_m/alpha_e)*inner(j_in[n], v_k_e)*dx
-            
+            A_k_i += 1.0/self.dt*df.inner(k_i - k_i_, v_k_i)*df.dx \
+                        - df.inner(j_i, df.grad(v_k_i))*df.dx \
+                        + (gamma_m/alpha_i)*df.inner(j_m[n], v_k_i)*df.dx
+
+            # form for conservation of ion n in ECS
+            A_k_e += 1.0/self.dt*df.inner(k_e - k_e_, v_k_e)*df.dx \
+                        - df.inner(j_e, df.grad(v_k_e))*df.dx \
+                        - (gamma_m/alpha_e)*df.inner(j_m[n], v_k_e)*df.dx \
+                        - (gamma_m/alpha_e)*df.inner(j_in[n], v_k_e)*df.dx
+
             # add ion specific part to form for ICS potential
-            A_phi_i += - inner(z[n]*alpha_i*j_i, grad(v_phi_i))*dx + gamma_m*inner(z[n]*j_m[n], v_phi_i)*dx
+            A_phi_i += - df.inner(z[n]*alpha_i*j_i, df.grad(v_phi_i))*df.dx \
+                        + gamma_m*df.inner(z[n]*j_m[n], v_phi_i)*df.dx
 
             # add ion specific part to form for ECS potential
-            A_phi_e += - inner(z[n]*alpha_e*j_e, grad(v_phi_e))*dx - gamma_m*inner(z[n]*j_m[n], v_phi_e)*dx
+            A_phi_e += - df.inner(z[n]*alpha_e*j_e, df.grad(v_phi_e))*df.dx \
+                        - gamma_m*df.inner(z[n]*j_m[n], v_phi_e)*df.dx
 
         # assemble system
         self.A = A_k_i + A_k_e + A_phi_i + A_phi_e + A_lag
 
         # initiate solver
         bcs = None
-        J = derivative(self.A, self.w)                                # calculate Jacobian
-        model = NonlinearVariationalProblem(self.A, self.w, bcs, J)   # create model
-        self.PDE_solver  = NonlinearVariationalSolver(model)          # create solver
-        prm = self.PDE_solver.parameters                              # get parameters
-        
-        prm['newton_solver']['absolute_tolerance'] = 1E-14            # set absolute tolerance
-        prm['newton_solver']['relative_tolerance'] = 1E-10            # set relative tolerance
-        prm['newton_solver']['maximum_iterations'] = 10               # set max iterations
-        prm['newton_solver']['relaxation_parameter'] = 1.0            # set relaxation parameter
+        J = df.derivative(self.A, self.w)
+        model = df.NonlinearVariationalProblem(self.A, self.w, bcs, J)
+        self.PDE_solver = df.NonlinearVariationalSolver(model)
+        prm = self.PDE_solver.parameters
+
+        prm['newton_solver']['absolute_tolerance'] = 1E-14
+        prm['newton_solver']['relative_tolerance'] = 1E-10
+        prm['newton_solver']['maximum_iterations'] = 10
+        prm['newton_solver']['relaxation_parameter'] = 1.0
 
         return
 
@@ -210,7 +200,7 @@ class Solver():
             self.w_.assign(self.w)      # update previous PDE solutions
 
             # save results every eval_int'th time step
-            if (k % eval_int==0) and path_results:
+            if (k % eval_int == 0) and path_results:
                 self.save_h5()
 
             # update iteration number
@@ -225,7 +215,7 @@ class Solver():
     def initialize_h5_savefile(self, filename):
         """ initialize h5 file """
         self.h5_idx_PDE = 0
-        self.h5_file_PDE = HDF5File(self.mesh.mpi_comm(), filename, 'w')
+        self.h5_file_PDE = df.HDF5File(self.mesh.mpi_comm(), filename, 'w')
         self.h5_file_PDE.write(self.mesh, '/mesh')
         self.h5_file_PDE.write(self.w, '/solution',  self.h5_idx_PDE)
         return
