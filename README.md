@@ -6,7 +6,8 @@ one representing an astrocyte network (ICS) and one representing the
 extracellular space (ECS). ffian.flow\_model takes transmembrane- and
 compartmental fluid flow into account and predicts the evolution in time
 and distribution in space of the volume fractions, 
-ion concentrations (Na<+>, K<+>, Cl<->), electrical potentials, and hydrostatic
+ion concentrations (Na<sup>+</sup>, K<sup>+</sup>, Cl<sup>-</sup>), 
+electrical potentials, and hydrostatic
 pressures in the ICS and ECS. In ffian.zero\_flow\_model, 
 the transmembrane- and compartmental fluid flow is assumed to be zero.
 The model is presented in Sætra et al. 2023 [XXX].
