@@ -5,11 +5,11 @@ from .model_base import ModelBase
 class Model(ModelBase):
     """ Model setup with input zone in the middle of the domain. """
 
-    def __init__(self, model_v, mesh, L, t_PDE, j_in, stim_start, stim_end):
+    def __init__(self, model_v, mesh, L, t_PDE, j_ini_const, stim_start, stim_end):
         ModelBase.__init__(self, model_v, mesh, L, t_PDE)
         self.stim_start = stim_start  # time of input onset (s)
         self.stim_end = stim_end      # time of input offset (s)
-        self.j_in = j_in  # constant input in input zone (mol/(m^2s))
+        self.j_in_const = j_in_const  # constant input in input zone (mol/(m^2s))
 
     def j_in(self, t):
         """ Constant input flux. """
@@ -19,7 +19,7 @@ class Model(ModelBase):
         L2 = self.L/2+L_in/2
 
         j = df.Expression('j_in*(x[0] > L1)*(x[0] < L2)*(t >= tS)*(t <= tE)',
-                          L1=L1, L2=L2, j_in=self.j_in, t=t,
+                          L1=L1, L2=L2, j_in=self.j_in_const, t=t,
                           tS=self.stim_start, tE=self.stim_end, degree=1)
 
         return j
