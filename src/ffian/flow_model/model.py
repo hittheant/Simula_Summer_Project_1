@@ -5,7 +5,7 @@ from .model_base import ModelBase
 class Model(ModelBase):
     """ Model setup with input zone in the middle of the domain. """
 
-    def __init__(self, model_v, mesh, L, t_PDE, j_ini_const, stim_start, stim_end):
+    def __init__(self, model_v, mesh, L, t_PDE, j_in_const, stim_start, stim_end):
         ModelBase.__init__(self, model_v, mesh, L, t_PDE)
         self.stim_start = stim_start  # time of input onset (s)
         self.stim_end = stim_end      # time of input offset (s)
