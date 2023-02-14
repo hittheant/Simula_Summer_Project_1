@@ -1,0 +1,8 @@
+format: jb-book
+root: README
+
+parts:
+
+  - caption: API
+    chapters:
+    - file: docs/api

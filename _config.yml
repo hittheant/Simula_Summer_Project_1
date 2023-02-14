@@ -1,0 +1,34 @@
+title: ffian - Fluid Flow In Astrocyte Networks
+author: Marte J. Sætra, Ada J. Ellingsrud
+copyright: "2023"
+only_build_toc_files : true
+
+execute:
+  execute_notebooks: cache
+
+repository:
+  url: https://github.com/martejulie/fluid-flow-in-astrocyte-networks-analysis
+  branch: main
+
+launch_buttons:
+  notebook_interface: "jupyterlab"
+  binderhub_url: "https://mybinder.org"
+
+html:
+  use_issues_button: true
+  use_repository_button: true
+
+parse:
+  myst_enable_extensions:
+    - amsmath
+    - dollarmath
+    - linkify
+
+sphinx:
+  extra_extensions:
+  - 'sphinx.ext.autodoc'
+  - 'sphinx.ext.napoleon'
+  - 'sphinx.ext.viewcode'
+
+
+exclude_patterns: ["src/*", "test/*", ".pytest_cache/*", "*.py"]
