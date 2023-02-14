@@ -1,0 +1,7 @@
+name: test-env
+channels:
+  - conda-forge
+dependencies:
+  - fenics-dolfin
+  - numpy
+  - python=3.10
