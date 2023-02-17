@@ -4,12 +4,18 @@ import sys
 
 class Solver():
     """ Class for solving the model presented in Sætra et al. (2023)
-        with unknowns w = (alpha_i, k_r, phi_r_, p_e) where:
+        with unknowns w = (alpha_i, k_r, phi_r, p_e) where:
 
-        alpha_i - intracellular volume fraction
-        k_r     - concentration of ion species k in compartment r
-        phi_r   - potential in compartment r
-        p_e     - extracellular hydrostatic pressure """
+        - alpha_i: intracellular volume fraction
+        - k_i: concentration of ion species k in compartment r
+        - phi_r: potential in compartment r
+        - p_e: extracellular hydrostatic pressure
+
+    Args:
+        model: The model
+        dt_value: The time step
+        Tstop: End time of simulation
+    """
 
     def __init__(self, model, dt_value, Tstop):
         """ Initialize solver """

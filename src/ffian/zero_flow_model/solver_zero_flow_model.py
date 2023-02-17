@@ -3,7 +3,7 @@ import dolfin as df
 
 class Solver():
     """ Class for solving the zero-flow model used in Sætra et al. 2023
-        with unknowns w = (k_r, phi_r_) where:
+        with unknowns w = (k_r, phi_r) where:
 
         k_r     - concentration of ion species k in compartment r
         phi_r   - potential in compartment r """

@@ -3,12 +3,12 @@
 ffian is an implementation of the KNP continuity equations for a 
 one-dimensional system containing two compartments: 
 one representing an astrocyte network (ICS) and one representing the
-extracellular space (ECS). ffian.flow\_model takes transmembrane- and
+extracellular space (ECS). `ffian.flow_model` takes transmembrane- and
 compartmental fluid flow into account and predicts the evolution in time
 and distribution in space of the volume fractions, 
 ion concentrations (Na<sup>+</sup>, K<sup>+</sup>, Cl<sup>-</sup>), 
 electrical potentials, and hydrostatic
-pressures in the ICS and ECS. In ffian.zero\_flow\_model, 
+pressures in the ICS and ECS. In `ffian.zero_flow_model`, 
 the transmembrane- and compartmental fluid flow is assumed to be zero 
 (corresponding to the model presented in 
 [Halnes et al. 2013](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1003386)).
@@ -58,12 +58,10 @@ docker run -ti -v $(pwd):/root/shared -w /root/shared ghcr.io/martejulie/fluid-f
 To install the `ffian`-library from source, navigate to the root of the repository and
 run the following commands from the command line:
 ```bash
-cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -B build-dir cpp/
-ninja -j3 install -C build-dir
 python3 -m pip install python/. --upgrade
 ```
 
-`ffian` requires `fenics-dolfin` and `numpy`.
+`ffian` requires `fenics-dolfin`, `numpy`, and `matplotlib`.
 
 ## Run simulations
 

@@ -19,7 +19,8 @@ license = {file = "LICENSE"}
 # Direct dependencies
 dependencies = [
     'numpy',
-    'fenics-dolfin'
+    'fenics-dolfin',
+    'matplotlib'
 ]
 
 [project.optional-dependencies]

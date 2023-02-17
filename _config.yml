@@ -31,4 +31,4 @@ sphinx:
   - 'sphinx.ext.viewcode'
 
 
-exclude_patterns: ["src/*", "test/*", ".pytest_cache/*", "*.py"]
+exclude_patterns: ["src/*", "test/*", ".pytest_cache/*", "tests/.pytest_cache/*", "*.py"]

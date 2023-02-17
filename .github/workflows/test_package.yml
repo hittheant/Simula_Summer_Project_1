@@ -15,7 +15,7 @@ jobs:
  
     runs-on: ubuntu-22.04
 
-    container: ghcr.io/scientificcomputing/fenics:2023-01-16
+    container: ghcr.io/scientificcomputing/fenics:2023-02-17
 
     steps:
       # This action sets the current path to the root of your github repo
