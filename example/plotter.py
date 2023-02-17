@@ -311,7 +311,7 @@ class Plotter():
             plt.ylabel(r'$\phi_\mathrm{m}$ (mV)', fontsize=fosi)
             plt.plot(phi_ms, color=c1, linewidth=lw)
             plt.xlabel(r'time (s)', fontsize=fosi)
-            
+
             plt.figlegend(bbox_to_anchor=(0.26, 0.69), frameon=True)
 
             axes = [ax1, ax2, ax3, ax4, ax5]
@@ -339,14 +339,14 @@ class Plotter():
         return
 
     def spaceplot(self, path_figs, model_v, n):
-        """ Plot spatial profiles of the input/decay-currents, 
+        """ Plot spatial profiles of the input/decay-currents,
         changes in ECS and ICS ion concentrations,
         changes in ECS and ICS volume fractions,
         changes in transmembrane hydrostatic pressure,
         and membrane potential at t = n. """
 
         if model_v != 'M0':
-            
+
             # get parameters
             K_m = self.model.params['K_m']
             p_m_init = self.model.params['p_m_init']
@@ -370,7 +370,7 @@ class Plotter():
             # get input/decay fluxes
             j_in_ = self.model.j_in(n)
             j_dec_ = self.model.j_dec(K_e_)
-            
+
             # calculate transmembrane hydrostatic pressure
             tau = K_m*(alpha_i_ - alpha_i_init)
             p_m = tau + p_m_init
@@ -388,7 +388,7 @@ class Plotter():
             dCl_i_ = Cl_i_ - float(self.model.Cl_i_init)
             dCl_e_ = Cl_e_ - float(self.model.Cl_e_init)
             dp_m_ = p_m - p_m_init
-           
+
             # project to function space
             j_in = self.project_to_function_space(j_in_*1e6)    # convert to umol/(m^2s)
             j_dec = self.project_to_function_space(j_dec_*1e6)  # convert to umol/(m^2s)
@@ -458,7 +458,7 @@ class Plotter():
             axes = [ax1, ax2, ax3, ax4, ax5, ax6, ax7, ax8]
 
         else:
-            
+
             # get data
             Na_i_ = self.read_from_file(n, 0)
             Na_e_ = self.read_from_file(n, 1)
@@ -472,7 +472,7 @@ class Plotter():
             # get input/decay fluxes
             j_in_ = self.model.j_in(n)
             j_dec_ = self.model.j_dec(K_e_)
-            
+
             # calculate membrane potential
             phi_m_ = (phi_i_ - phi_e_)*1000  # convert to mV
 
@@ -483,7 +483,7 @@ class Plotter():
             dK_e_ = K_e_ - float(self.model.K_e_init)
             dCl_i_ = Cl_i_ - float(self.model.Cl_i_init)
             dCl_e_ = Cl_e_ - float(self.model.Cl_e_init)
-           
+
             # project to function space
             j_in = self.project_to_function_space(j_in_*1e6)    # convert to umol/(m^2s)
             j_dec = self.project_to_function_space(j_dec_*1e6)  # convert to umol/(m^2s)
@@ -529,7 +529,7 @@ class Plotter():
             plt.xlabel(xlabel_x, fontsize=fosi)
             plt.ylabel(r'$\phi_\mathrm{m}$ (mV)', fontsize=fosi)
             df.plot(phi_m, color=c1, linewidth=lw)
-            
+
             plt.figlegend(bbox_to_anchor=(0.26, 0.69), frameon=True)
 
             axes = [ax1, ax2, ax3, ax4, ax5]
@@ -556,4 +556,3 @@ class Plotter():
         plt.close()
 
         return
-
