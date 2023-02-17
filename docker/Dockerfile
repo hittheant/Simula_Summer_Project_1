@@ -20,4 +20,6 @@ SHELL ["mamba", "run", "-n", "dockerenv", "/bin/bash", "-c"]
 COPY . ffian/ 
 RUN python3 -m pip install ./ffian
 
+RUN apt-get install -y texlive-latex-base texlive-latex-extra cm-super --no-install-recommends  dvipng
+
 RUN echo "source activate dockerenv" > ~/.bashrc

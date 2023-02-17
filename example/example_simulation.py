@@ -28,9 +28,11 @@ def run_model(model_v, j_in, Tstop, stim_start, stim_end):
     t_PDE = df.Constant(0.0)                 # time constant
 
     if model_v == "M0":
-        model = zero_flow_model.Model(mesh, L, t_PDE, j_in, stim_start, stim_end)
+        model = zero_flow_model.Model(
+            mesh, L, t_PDE, j_in, stim_start, stim_end)
     else:
-        model = flow_model.Model(model_v, mesh, L, t_PDE, j_in, stim_start, stim_end)
+        model = flow_model.Model(
+            model_v, mesh, L, t_PDE, j_in, stim_start, stim_end)
 
     # check that directory for results (data) exists, if not create
     path_data = 'results/data/' + model_v + '/'
@@ -51,7 +53,6 @@ def run_model(model_v, j_in, Tstop, stim_start, stim_end):
 
 if __name__ == '__main__':
 
-
     model_v = 'M3'      # model version ('M1', 'M2', 'M3', or 'M0')
     j_in = 1.0e-6       # constant input in input zone (mol/(m^2s))
     Tstop = 30          # duration of simulation (s)
@@ -71,4 +72,4 @@ if __name__ == '__main__':
 
     # plot figures
     P.timeplot(path_figs, model_v, Tstop)
-    P.spaceplot(path_figs, model_v, 20)
+    P.spaceplot(path_figs, model_v, stim_end)

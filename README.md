@@ -18,6 +18,9 @@ The fluid model is presented in Sætra et al. 2023 [XXX].
 
 ### Conda
 
+> **Warning**
+> If you want to run the examples, and use conda to install `ffian`, you need to have `texlive-core` installed on your system.
+
 Start by cloning into the repository:
 
 ``` console
@@ -26,6 +29,8 @@ $ cd ffian
 ```
 
 Then, using the ``environment.yml`` file in the root of the repository, you can call:
+
+
 
 ``` console
 $ conda env update --file environment.yml --name your_environment
