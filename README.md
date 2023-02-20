@@ -14,6 +14,10 @@ the transmembrane- and compartmental fluid flow is assumed to be zero
 [Halnes et al. 2013](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1003386)).
 The fluid model is presented in Sætra et al. 2023 [XXX].
 
+## Documentation
+
+Documentation at [https://martejulie.github.io/fluid-flow-in-astrocyte-networks](https://martejulie.github.io/fluid-flow-in-astrocyte-networks).
+
 ## Installation
 
 ### Conda
