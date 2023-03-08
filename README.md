@@ -12,7 +12,7 @@ pressures in the ICS and ECS. In `ffian.zero_flow_model`,
 the transmembrane- and compartmental fluid flow is assumed to be zero 
 (corresponding to the model presented in 
 [Halnes et al. 2013](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1003386)).
-The fluid model is presented in Sætra et al. 2023, [Neural activity induces strongly coupled electro-chemo-mechanical interactions and fluid flow in astrocyte networks and extracellular space – a computational study](https://doi.org/10.1101/2023.03.06.531247).
+The fluid model is presented in Sætra et al. 2023, [Neural activity induces strongly coupled electro-chemo-mechanical interactions and fluid flow in astrocyte networks and extracellular space – a computational study](https://www.biorxiv.org/content/10.1101/2023.03.06.531247v1).
 
 ## Documentation
 

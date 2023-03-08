@@ -23,6 +23,8 @@ identifiers:
     value: 10.1101/2023.03.06.531247
 repository-code: >-
   https://github.com/martejulie/fluid-flow-in-astrocyte-networks
+url: >-
+  https://www.biorxiv.org/content/10.1101/2023.03.06.531247v1
 license: MIT
 version: 0.2.0
 date-released: '2023-03-08'
