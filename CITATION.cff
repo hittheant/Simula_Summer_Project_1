@@ -1,0 +1,28 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: >-
+  Neural activity induces strongly coupled
+  electro-chemo-mechanical interactions and fluid flow in
+  astrocyte networks and extracellular space – a
+  computational study
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Marte J.
+    family-names: Sætra
+  - given-names: Ada J.
+    family-names: Ellingsrud
+  - given-names: Marie E.
+    family-names: Rognes
+identifiers:
+  - type: doi
+    value: 10.1101/2023.03.06.531247
+repository-code: >-
+  https://github.com/martejulie/fluid-flow-in-astrocyte-networks
+license: MIT
+version: 0.2.0
+date-released: '2023-03-08'
