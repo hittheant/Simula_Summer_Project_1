@@ -6,14 +6,15 @@ from ffian import flow_model, zero_flow_model
 from plotter import Plotter
 
 
-def run_model(model_v, j_in, Tstop, stim_start, stim_end):
+def run_model(model_v, j_in, Tstop, stim_start, stim_end, stim_protocol):
     """
     Arguments:
         model_v (str): model version
         j_in (float): constant input in input zone (mol/(m^2s))
         Tstop (float): end time (s)
-        stim_start (float): stimuli onset (s)
-        stim_end (float): stimuli offset (s)
+        stim_start (float): stimulus onset (s)
+        stim_end (float): stimulus offset (s)
+        stim_protocol (str): stimulus protocol
     """
 
     # mesh
@@ -32,7 +33,7 @@ def run_model(model_v, j_in, Tstop, stim_start, stim_end):
             mesh, L, t_PDE, j_in, stim_start, stim_end)
     else:
         model = flow_model.Model(
-            model_v, mesh, L, t_PDE, j_in, stim_start, stim_end)
+            model_v, mesh, L, t_PDE, j_in, stim_start, stim_end, stim_protocol)
 
     # check that directory for results (data) exists, if not create
     path_data = 'results/data/' + model_v + '/'
@@ -53,14 +54,15 @@ def run_model(model_v, j_in, Tstop, stim_start, stim_end):
 
 if __name__ == '__main__':
 
-    model_v = 'M3'      # model version ('M1', 'M2', 'M3', or 'M0')
-    j_in = 1.0e-6       # constant input in input zone (mol/(m^2s))
-    Tstop = 30          # duration of simulation (s)
-    stim_start = 10     # stimuli onset (s)
-    stim_end = 20       # stimuli offset (s)
+    model_v = 'M3'              # model version ('M1', 'M2', 'M3', or 'M0')
+    j_in = 1.0e-6               # input constant (mol/(m^2s))
+    Tstop = 30                  # duration of simulation (s)
+    stim_start = 10             # stimulus onset (s)
+    stim_end = 20               # stimulus offset (s)
+    stim_protocol = 'constant'  # stimulues protocol ('constant', 'slow', or 'ultraslow')
 
     # run model
-    model, path_data = run_model(model_v, j_in, Tstop, stim_start, stim_end)
+    model, path_data = run_model(model_v, j_in, Tstop, stim_start, stim_end, stim_protocol)
 
     # create plotter object for visualizing results
     P = Plotter(model, path_data)
