@@ -7,10 +7,10 @@ class Model(ModelBase):
 
     def __init__(self, model_v, mesh, L, t_PDE, j_in_const, stim_start, stim_end, stim_protocol='constant'):
         ModelBase.__init__(self, model_v, mesh, L, t_PDE)
-        self.stim_start = stim_start       # time of input onset (s)
-        self.stim_end = stim_end           # time of input offset (s)
-        self.j_in_const = j_in_const       # constant input in input zone (mol/(m^2s))
-        self.stim_protol = stim_protocol   # stimulus protocol
+        self.stim_start = stim_start         # time of input onset (s)
+        self.stim_end = stim_end             # time of input offset (s)
+        self.j_in_const = j_in_const         # constant input in input zone (mol/(m^2s))
+        self.stim_protocol = stim_protocol   # stimulus protocol
 
     def j_in(self, t):
         """ Constant input flux. """
@@ -19,15 +19,15 @@ class Model(ModelBase):
         L1 = self.L/2-L_in/2
         L2 = self.L/2+L_in/2
 
-        if stim_protocol == 'constant':
+        if self.stim_protocol == 'constant':
             j = df.Expression('j_in*(x[0] > L1)*(x[0] < L2)*(t >= tS)*(t <= tE)',
                               L1=L1, L2=L2, j_in=self.j_in_const, t=t,
                               tS=self.stim_start, tE=self.stim_end, degree=1)
-        elif stim_protocol == 'slow':
+        elif self.stim_protocol == 'slow':
              j = df.Expression('(x[0] > L1)*(x[0] < L2)*(t >= tS)*(t <= tE)*(j_in/2*sin(2*pi*t) + j_in/2)',
                                L1=L1, L2=L2, j_in=self.j_in_const, t=t, \
                                tS=self.stim_start, tE=self.stim_end, degree=1)
-        elif stim_protocol == 'ultraslow':
+        elif self.stim_protocol == 'ultraslow':
              j = df.Expression('(x[0] > L1)*(x[0] < L2)*(t >= tS)*(t <= tE)*(j_in/2*sin(2*pi*t*0.05) + j_in/2)',
                                L1=L1, L2=L2, j_in=self.j_in_const, t=t, \
                                tS=self.stim_start, tE=self.stim_end, degree=1)
