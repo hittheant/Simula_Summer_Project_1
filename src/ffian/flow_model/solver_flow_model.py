@@ -29,6 +29,7 @@ class Solver():
         self.mesh = model.mesh              # mesh
         self.N_ions = model.N_ions          # number of ions
         self.N_comparts = model.N_comparts  # number of compartments
+        self.stim_protocol = model.stim_protocol # stimulus protocol
 
         # create function spaces
         self.setup_function_spaces()
@@ -266,8 +267,12 @@ class Solver():
     def solve_system(self, path_results=False):
         """ Solve PDE system with iterative Newton solver """
 
-        # save results at every second
-        eval_int = float(1.0/self.dt)
+        if self.stim_protocol == 'constant' or self.stim_protocol == None:
+            # save results at every second
+            eval_int = float(1.0/self.dt)
+        else:
+            # save results at every timestep
+            eval_int = 1
 
         # initialize saving of results
         if path_results:
