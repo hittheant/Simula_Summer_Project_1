@@ -267,7 +267,7 @@ class Solver():
     def solve_system(self, path_results=False):
         """ Solve PDE system with iterative Newton solver """
 
-        if self.stim_protocol == 'constant':
+        if self.stim_protocol == 'constant' or self.stim_protocol == None:
             # save results at every second
             eval_int = float(1.0/self.dt)
         else:

@@ -26,6 +26,7 @@ class ModelBase():
         self.t_PDE = t_PDE          # time constant
         self.N_ions = 3             # number of ions
         self.N_comparts = 2         # number of compartments
+        self.stim_protocol = None
 
         # set parameters and initial conditions
         self.set_initial_conditions()
