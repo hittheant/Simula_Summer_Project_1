@@ -1,5 +1,6 @@
 # ffian: Fluid Flow In Astrocyte Networks
 # This is a private repo cloned from the original repo hosted by martejulie
+Hi this is Paola
 ffian is an implementation of the KNP continuity equations for a 
 one-dimensional system containing two compartments: 
 one representing an astrocyte network (ICS) and one representing the
