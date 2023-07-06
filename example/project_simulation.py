@@ -1,8 +1,9 @@
 import dolfin as df
 import os
+import inspect
 
 # set path to solver
-from ffian import project_flow_models
+from ffian.project_flow_models import *
 from plotter import Plotter
 
 
@@ -29,8 +30,12 @@ def run_model(model_v, j_in, Tstop, stim_start, stim_end, stim_protocol):
     t_PDE = df.Constant(0.0)  # time constant
 
     # model initialization
-    exec(f"model = project_flow_models.Model{model_v}("
-         f"mesh, L, t_PDE, j_in, stim_start, stim_end, stim_protocol")
+    class_name = f"Model{model_v}"
+    if class_name in globals() and inspect.isclass(globals()[class_name]):
+        model_type = globals()[class_name]
+        model = model_type(mesh, L, t_PDE, j_in, stim_start, stim_end, stim_protocol)
+    else:
+        raise Exception("Invalid model version")
 
     # check that directory for results (data) exists, if not create
     path_data = 'results/data/' + model_v + '/'
@@ -38,7 +43,7 @@ def run_model(model_v, j_in, Tstop, stim_start, stim_end, stim_protocol):
     if not os.path.isdir(path_data):
         os.makedirs(path_data)
 
-    S = project_flow_models.Solver(model, dt_value, Tstop)
+    S = Solver(model, dt_value, Tstop)
 
     S.solve_system(path_results=path_data)
 
@@ -54,7 +59,7 @@ if __name__ == '__main__':
     stim_protocol = 'constant'  # stimulues protocol ('constant', 'slow', or 'ultraslow')
 
     # run model
-    model, path_data = run_model(j_in, Tstop, stim_start, stim_end, stim_protocol)
+    model, path_data = run_model(model_v, j_in, Tstop, stim_start, stim_end, stim_protocol)
 
     # create plotter object for visualizing results
     P = Plotter(model, path_data)
