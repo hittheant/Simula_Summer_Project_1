@@ -26,13 +26,11 @@ def run_model(model_v, j_in, Tstop, stim_start, stim_end, stim_protocol):
     dt_value = 1e-3                          # time step (s)
 
     # model setup
-    t_PDE = df.Constant(0.0)                 # time constant
-    if model_v == "M0":
-        model = zero_flow_model.Model(
-            mesh, L, t_PDE, j_in, stim_start, stim_end)
-    else:
-        model = flow_model.Model(
-            model_v, mesh, L, t_PDE, j_in, stim_start, stim_end, stim_protocol)
+    t_PDE = df.Constant(0.0)  # time constant
+
+    # model initialization
+    exec(f"model = project_flow_models.Model{model_v}("
+         f"mesh, L, t_PDE, j_in, stim_start, stim_end, stim_protocol")
 
     # check that directory for results (data) exists, if not create
     path_data = 'results/data/' + model_v + '/'
@@ -40,11 +38,7 @@ def run_model(model_v, j_in, Tstop, stim_start, stim_end, stim_protocol):
     if not os.path.isdir(path_data):
         os.makedirs(path_data)
 
-    # solve system
-    if model_v == "M0":
-        S = zero_flow_model.Solver(model, dt_value, Tstop)
-    else:
-        S = flow_model.Solver(model, dt_value, Tstop)
+    S = project_flow_models.Solver(model, dt_value, Tstop)
 
     S.solve_system(path_results=path_data)
 
@@ -52,8 +46,7 @@ def run_model(model_v, j_in, Tstop, stim_start, stim_end, stim_protocol):
 
 
 if __name__ == '__main__':
-
-    model_v = 'M3'              # model version ('M1', 'M2', 'M3', or 'M0')
+    model_v = "MC1"             # Model (hypothesis) number
     j_in = 1.0e-6               # input constant (mol/(m^2s))
     Tstop = 30                  # duration of simulation (s)
     stim_start = 10             # stimulus onset (s)
@@ -61,7 +54,7 @@ if __name__ == '__main__':
     stim_protocol = 'constant'  # stimulues protocol ('constant', 'slow', or 'ultraslow')
 
     # run model
-    model, path_data = run_model(model_v, j_in, Tstop, stim_start, stim_end, stim_protocol)
+    model, path_data = run_model(j_in, Tstop, stim_start, stim_end, stim_protocol)
 
     # create plotter object for visualizing results
     P = Plotter(model, path_data)
