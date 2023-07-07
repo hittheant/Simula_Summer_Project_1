@@ -18,7 +18,8 @@ class ModelBase():
     """ Modeling electrodiffusive, osmotic, and hydrostatic
         interplay in astrocyte networks. """
 
-    def __init__(self, mesh, L, t_PDE, options: dict = None):
+    def __init__(self, model_v, mesh, L, t_PDE, options: dict = None):
+        self.model_v = model_v
         self.mesh = mesh            # mesh
         self.L = L                  # length of domain (m)
         self.t_PDE = t_PDE          # time constant
