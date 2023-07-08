@@ -30,13 +30,12 @@ def run_model(model_v, j_in, Tstop, stim_start, stim_end, stim_protocol):
     t_PDE = df.Constant(0.0)  # time constant
 
     # model initialization
-    # class_name = f"Model{model_v}"
-    # if class_name in globals() and inspect.isclass(globals()[class_name]):
-    #     model_type = globals()[class_name]
-    #     model = model_type(mesh, L, t_PDE, j_in, stim_start, stim_end, stim_protocol)
-    # else:
-    #     raise Exception("Invalid model version")
-    model = ModelMC1(model_v, mesh, L, t_PDE, j_in, stim_start, stim_end, stim_protocol)
+    class_name = f"Model{model_v}"
+    if class_name in globals() and inspect.isclass(globals()[class_name]):
+        model_type = globals()[class_name]
+        model = model_type(model_v, mesh, L, t_PDE, j_in, stim_start, stim_end, stim_protocol)
+    else:
+        raise Exception("Invalid model version")
 
     # check that directory for results (data) exists, if not create
     path_data = 'results/data/' + model_v + '/'
