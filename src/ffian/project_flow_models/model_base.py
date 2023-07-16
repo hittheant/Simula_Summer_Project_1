@@ -67,10 +67,11 @@ class ModelBase():
         g_Na = df.Constant(1.0)            # sodium conductance [S/m^2]
         g_Cl = df.Constant(0.5)            # chloride conductance [S/m^2]
         g_K = df.Constant(16.96)           # potassium conductance [S/m^2]
+
         rho_pump = df.Constant(1.12e-6)    # max pump rate [mol/(m^2s)]
         P_Nai = df.Constant(10.0)          # pump threshold - Na_i [mol/m^3]
         P_Ke = df.Constant(1.5)            # pump threshold - K_e [mol/m^3]
-        eta_m = df.Constant(8.14e-14)      # membrare water permeab. [m/(Pa*s)]
+        eta_m = df.Constant(8.14e-14)      # membrane water permeab. [m/(Pa*s)]
 
         # compartmental fluid flow parameters
         kappa_i = df.Constant(1.8375e-14)  # ICS water permeability [m^4/(N*s)]

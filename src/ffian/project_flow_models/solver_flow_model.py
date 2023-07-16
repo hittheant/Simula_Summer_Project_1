@@ -163,7 +163,7 @@ class Solver():
             u_i = - kappa[0]*(df.grad(p_i)
                     - R*temperature*df.grad(a_i/alpha_i))
             u_e = - kappa[1]*df.grad(p_e)
-        elif self.model.model_v == 'M3':
+        elif self.model.model_v == 'M3' or self.model.model_v == 'MC4':
             u_i = - kappa[0]*(df.grad(p_i)
                     - R*temperature*df.grad(a_i/alpha_i))
             u_e = - kappa[1]*df.grad(p_e) \
