@@ -74,43 +74,45 @@ class ModelMC4(ModelBase):
 
         return j
 
- def set_membrane_fluxes(self, w):
-        """ Set the transmembrane ion fluxes. """
 
-        # get parameters
-        F = self.params['F']
-        R = self.params['R']
-        temperature = self.params['temperature']
-        z_Na = self.params['z'][0]
-        z_K = self.params['z'][1]
-        z_Cl = self.params['z'][2]
+def set_membrane_fluxes(self, w):
+    """ Set the transmembrane ion fluxes. """
 
-        # split unknowns
-        alpha_i, Na_i, Na_e, K_i, K_e, Cl_i, Cl_e, \
-            phi_i, phi_e, p_e, c = df.split(w)
+    # get parameters
+    F = self.params['F']
+    R = self.params['R']
+    temperature = self.params['temperature']
+    z_Na = self.params['z'][0]
+    z_K = self.params['z'][1]
+    z_Cl = self.params['z'][2]
 
-        # membrane potential
-        phi_m = phi_i - phi_e
+    # split unknowns
+    alpha_i, Na_i, Na_e, K_i, K_e, Cl_i, Cl_e, \
+        phi_i, phi_e, p_e, c = df.split(w)
 
-        # reversal potentials
-        E_Na = R*temperature/(F*z_Na)*df.ln(Na_e/Na_i)  # sodium    - (V)
-        E_K = R*temperature/(F*z_K)*df.ln(K_e/K_i)      # potassium - (V)
-        E_Cl = R*temperature/(F*z_Cl)*df.ln(Cl_e/Cl_i)  # chloride  - (V)
+    # membrane potential
+    phi_m = phi_i - phi_e
 
-        # membrane fluxes
-        j_leak_Na = self.j_leak_Na(phi_m, E_Na)
-        j_leak_Cl = self.j_leak_Cl(phi_m, E_Cl)
-        j_Kir = self.j_Kir(phi_m, E_K, K_e)
-        j_pump = self.j_pump(K_e, Na_i)
+    # reversal potentials
+    E_Na = R * temperature / (F * z_Na) * df.ln(Na_e / Na_i)  # sodium    - (V)
+    E_K = R * temperature / (F * z_K) * df.ln(K_e / K_i)  # potassium - (V)
+    E_Cl = R * temperature / (F * z_Cl) * df.ln(Cl_e / Cl_i)  # chloride  - (V)
 
-        # total transmembrane ion fluxes
-        j_Na = j_leak_Na + 3.0*j_pump           # sodium    - (mol/(m^2s))
-        j_K = j_Kir - 2.0*j_pump                # potassium - (mol/(m^2s))
-        j_Cl = j_leak_Cl                        # chloride  - (mol/(m^2s))
+    # membrane fluxes
+    j_leak_Na = self.j_leak_Na(phi_m, E_Na)
+    j_leak_Cl = self.j_leak_Cl(phi_m, E_Cl)
+    j_leak_K = self.j_leak_K(phi_m, E_K)
+    j_pump = self.j_pump(K_e, Na_i)
+    j_NKCC1 = self.j_NKCC1(w)
 
-        j_m = [j_Na, j_K, j_Cl]
+    # total transmembrane ion fluxes
+    j_Na = j_leak_Na + 3.0 * j_pump - j_NKCC1  # sodium    - (mol/(m^2s))
+    j_K = j_leak_K - 2.0 * j_pump - j_NKCC1  # potassium - (mol/(m^2s))
+    j_Cl = j_leak_Cl - 2.0 * j_NKCC1 # chloride  - (mol/(m^2s))
 
-        # set the membrane fluxes
-        self.membrane_fluxes = j_m
+    j_m = [j_Na, j_K, j_Cl]
 
-        return
+    # set the membrane fluxes
+    self.membrane_fluxes = j_m
+
+    return
