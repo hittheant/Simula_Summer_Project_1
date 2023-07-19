@@ -35,7 +35,7 @@ class ModelMC1(ModelBase):
         return j
 
     def j_dec(self, K_e):
-        """ Decay flux proportional to [K]_e. """
+        """ Decay flux proportional to [K]_e."""
 
         k_dec = df.Constant(2.9e-8)   # decay factor for [K]_e (m/s)
 
