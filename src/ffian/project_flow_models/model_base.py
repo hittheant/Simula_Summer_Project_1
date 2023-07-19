@@ -7,9 +7,11 @@ default_init_parameters = {"alpha_i": "0.4",
                            "Na_i": "15.474585472970270",
                            "K_i": "99.892102216365814",
                            "Cl_i": "5.363687689337043",
+                           "HCO3_i": "11.2",
                            "Na_e": "144.090829054058730",
                            "K_e": "3.215795567266669",
                            "Cl_e": "133.272624621326230",
+                           "HCO3_e": "8.5",
                            "phi_i": "-0.085861202415139",
                            "phi_e": "0.0"}
 
@@ -19,11 +21,12 @@ class ModelBase():
         interplay in astrocyte networks. """
 
     def __init__(self, model_v, mesh, L, t_PDE, options: dict = None):
-        self.model_v = model_v
+
+        self.model_v = model_v      # ('M1', 'M2' or 'M3') model version
         self.mesh = mesh            # mesh
         self.L = L                  # length of domain (m)
         self.t_PDE = t_PDE          # time constant
-        self.N_ions = 3             # number of ions
+        self.N_ions = 4             # number of ions
         self.N_comparts = 2         # number of compartments
         self.stim_protocol = None
 
@@ -51,9 +54,11 @@ class ModelBase():
         z_Na = df.Constant(1.0)            # sodium (Na)
         z_K = df.Constant(1.0)             # potassium (K)
         z_Cl = df.Constant(-1.0)           # chloride (Cl)
-        z_0 = df.Constant(0.0)             # immobile ions (a)
+        z_0 = df.Constant(0.0) 
+        z_NBC = df.Constant(-1.0)
+        z_HCO3 = df.Constant(-1.0)            # immobile ions (a)
         # x_0 will be calculated at the end of this function
-        z = [z_Na, z_K, z_Cl, z_0]
+        z = [z_Na, z_K, z_Cl, z_0, z_NBC, z_HCO3]
 
         # tortuosities
         lambda_i = df.Constant(3.2)
@@ -64,12 +69,13 @@ class ModelBase():
         gamma_m = df.Constant(8.0e6)       # area volume ratio [1/m]
         K_m = df.Constant(2.294e3)         # membrane stiffness [Pa]
         g_Na = df.Constant(1.0)            # sodium conductance [S/m^2]
-        g_Cl = df.Constant(1)            # chloride conductance [S/m^2] THIS IS CHANGED
+        g_Cl = df.Constant(0.5)            # chloride conductance [S/m^2]
         g_K = df.Constant(16.96)           # potassium conductance [S/m^2]
+        g_NBC = df:Constant(7.6e-1)        # NBC contransport conductance [S/m^2]
         rho_pump = df.Constant(1.12e-6)    # max pump rate [mol/(m^2s)]
         P_Nai = df.Constant(10.0)          # pump threshold - Na_i [mol/m^3]
         P_Ke = df.Constant(1.5)            # pump threshold - K_e [mol/m^3]
-        eta_m = df.Constant(8.14e-14)      # membrane water permeab. [m/(Pa*s)]
+        eta_m = df.Constant(8.14e-14)      # membrare water permeab. [m/(Pa*s)]
 
         # compartmental fluid flow parameters
         kappa_i = df.Constant(1.8375e-14)  # ICS water permeability [m^4/(N*s)]
@@ -88,7 +94,7 @@ class ModelBase():
                   'gamma_m': gamma_m, 'K_m': K_m,
                   'D': D, 'z': z,
                   'lambdas': lambdas,
-                  'g_Na': g_Na, 'g_Cl': g_Cl, 'g_K': g_K,
+                  'g_Na': g_Na, 'g_Cl': g_Cl, 'g_K': g_K, 'g_NBC': g_NBC,
                   'rho_pump': rho_pump, 'P_Ke': P_Ke, 'P_Nai': P_Nai,
                   'eta_m': eta_m, 'kappa': kappa,
                   'eps_r': eps_r, 'eps_zero': eps_zero,
@@ -112,6 +118,7 @@ class ModelBase():
         z_K = self.params['z'][1]
         z_Cl = self.params['z'][2]
         z_0 = self.params['z'][3]
+        z_HCO3 = self.params['z'][5]
         p_m_init = float(self.params['p_m_init'])
 
         # get initial conditions
@@ -120,16 +127,19 @@ class ModelBase():
         Na_e = float(self.Na_e_init)
         K_e = float(self.K_e_init)
         Cl_e = float(self.Cl_e_init)
+        HCO3_e_init = float(self.HCO3_e_init)         
         Na_i = float(self.Na_i_init)
         K_i = float(self.K_i_init)
         Cl_i = float(self.Cl_i_init)
+        HCO3_i_init = float(self.HCO3_i_init) 
+
 
         # calculate valence and amount of immobile ions
-        z_0 = (Na_e*z_Na + K_e*z_K + Cl_e*z_Cl - Na_i*z_Na -
-               K_i*z_K - Cl_i*z_Cl) / (p_m_init/(R*T) + Na_e
-                                       + K_e + Cl_e - Na_i - K_i - Cl_i)
-        a_e = - (Na_e*z_Na + K_e*z_K + Cl_e*z_Cl) * alpha_e / z_0
-        a_i = - (Na_i*z_Na + K_i*z_K + Cl_i*z_Cl) * alpha_i / z_0
+        z_0 = (Na_e*z_Na + K_e*z_K + Cl_e*z_Cl + HCO3_e*z_HCO3 - Na_i*z_Na -
+               K_i*z_K - Cl_i*z_Cl - HCO3_i*z_HCO3) / (p_m_init/(R*T) + Na_e
+                                       + K_e + Cl_e + HCO3_e - Na_i - K_i - Cl_i - HCO3_e)
+        a_e = - (Na_e*z_Na + K_e*z_K + Cl_e*z_Cl + HCO3_e*z_HCO3) * alpha_e / z_0
+        a_i = - (Na_i*z_Na + K_i*z_K + Cl_i*z_Cl + HCO3_i*z_HCO3) * alpha_i / z_0
 
         # set valence of immobile ions
         self.params['z'][3] = df.Constant(z_0)
@@ -155,10 +165,12 @@ class ModelBase():
         self.Na_i_init = in_options['Na_i']    # ICS Na [mol/m^3]
         self.K_i_init = in_options['K_i']      # ICS K [mol/m^3]
         self.Cl_i_init = in_options['Cl_i']    # ICS Cl [mol/m^3]
+        self.HCO3_i_init = in_options['HCO3_i'] # ICS HCO3 [mol/m^3]
 
         self.Na_e_init = in_options['Na_e']    # ECS Na [mol/m^3]
         self.K_e_init = in_options['K_e']      # ECS K [mol/m^3]
         self.Cl_e_init = in_options['Cl_e']    # ECS Cl [mol/m^3]
+        self.HCO3_e_init = in_options['HCO3_e'] # ECS HCO3 [mol/m^3]
 
         # electrical potentials
         self.phi_i_init = in_options['phi_i']  # ICS [V]
@@ -176,6 +188,8 @@ class ModelBase():
                                      self.K_e_init,
                                      self.Cl_i_init,
                                      self.Cl_e_init,
+                                     self.HCO3_i_init,
+                                     self.HCO3_e_init,
                                      self.phi_i_init,
                                      self.phi_e_init,
                                      self.p_e_init,
@@ -209,16 +223,43 @@ class ModelBase():
 
         return j
 
-    def j_leak_K(self, phi_m, E_K):
-        """ Potassium leak flux """
+    def j_Kir(self, phi_m, E_K, K_e):
+        """ Potassium inward rectifying (Kir) flux """
 
         # get parameters
         F = self.params['F']
+        R = self.params['R']
+        temperature = self.params['temperature']
         z_K = self.params['z'][1]
         g_K = self.params['g_K']
+        K_i_init = float(self.K_i_init)
+        K_e_init = float(self.K_e_init)
+
+        # set conductance
+        E_K_init = R*temperature/(F*z_K)*df.ln(K_e_init/K_i_init)
+        dphi = phi_m - E_K
+        A = 1 + df.exp(18.4/42.4)                                  # shorthand
+        B = 1 + df.exp(-(0.1186 + E_K_init)/0.0441)                # shorthand
+        C = 1 + df.exp((dphi + 0.0185)/0.0425)                    # shorthand
+        D = 1 + df.exp(-(0.1186 + phi_m)/0.0441)                   # shorthand
+        f_Kir = df.sqrt(K_e/K_e_init)*(A*B)/(C*D)
 
         # define and return flux (mol/(m^2*s))
-        j = g_K*(phi_m - E_K)/(F*z_K)
+        j = g_K*f_Kir*(phi_m - E_K)/(F*z_K)
+
+        return j
+
+    def j_pump(self, K_e, Na_i):
+        """ Na/K-pump flux"""
+
+        # get parameters
+        rho_pump = self.params['rho_pump']
+        P_Nai = self.params['P_Nai']
+        P_Ke = self.params['P_Ke']
+
+        # define and return flux (mol/(m^2s))
+        j = rho_pump*((Na_i**1.5 / (Na_i**1.5 + P_Nai**1.5))
+                      * (K_e / (K_e + P_Ke)))
 
         return j
 
@@ -248,12 +289,12 @@ class ModelBase():
         # membrane fluxes
         j_leak_Na = self.j_leak_Na(phi_m, E_Na)
         j_leak_Cl = self.j_leak_Cl(phi_m, E_Cl)
-        j_leak_K = self.j_leak_K(phi_m, E_K)
+        j_Kir = self.j_Kir(phi_m, E_K, K_e)
         j_pump = self.j_pump(K_e, Na_i)
 
         # total transmembrane ion fluxes
         j_Na = j_leak_Na + 3.0*j_pump           # sodium    - (mol/(m^2s))
-        j_K = j_leak_K - 2.0*j_pump                # potassium - (mol/(m^2s))
+        j_K = j_Kir - 2.0*j_pump                # potassium - (mol/(m^2s))
         j_Cl = j_leak_Cl                        # chloride  - (mol/(m^2s))
 
         j_m = [j_Na, j_K, j_Cl]
@@ -262,20 +303,6 @@ class ModelBase():
         self.membrane_fluxes = j_m
 
         return
-
-    def j_pump(self, K_e, Na_i):
-        """ Na/K-pump flux"""
-
-        # get parameters
-        rho_pump = self.params['rho_pump']
-        P_Nai = self.params['P_Nai']
-        P_Ke = self.params['P_Ke']
-
-        # define and return flux (mol/(m^2s))
-        j = rho_pump*((Na_i**1.5 / (Na_i**1.5 + P_Nai**1.5))
-                      * (K_e / (K_e + P_Ke)))
-
-        return j
 
     def set_input_fluxes(self, w):
         """ Set the input fluxes. """
