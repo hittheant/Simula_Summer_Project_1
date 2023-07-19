@@ -101,8 +101,8 @@ class ModelMC3(ModelMC1):
         # total transmembrane ion fluxes
         j_Na = j_leak_Na + 3.0*j_pump           # sodium    - (mol/(m^2s))
         j_K = j_Kir - 2.0*j_pump                # potassium - (mol/(m^2s))
-        j_Cl = j_leak_Cl    
-        j_HCO3 = -2*j_NBC                    # chloride  - (mol/(m^2s))
+        j_Cl = j_leak_Cl                        # chloride  - (mol/(m^2s))
+        j_HCO3 = -2*j_NBC                    
 
         j_m = [j_Na, j_K, j_Cl, j_HCO3]
 
