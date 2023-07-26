@@ -69,71 +69,71 @@ class ModelMC3(ModelMC1):
         return
 
         def set_membrane_fluxes(self, w):
-        """ Set the transmembrane ion fluxes. """
+            """ Set the transmembrane ion fluxes """
 
-        # get parameters
-        F = self.params['F']
-        R = self.params['R']
-        temperature = self.params['temperature']
-        z_Na = self.params['z'][0]
-        z_K = self.params['z'][1]
-        z_Cl = self.params['z'][2]
+            # get parameters
+            F = self.params['F']
+            R = self.params['R']
+            temperature = self.params['temperature']
+            z_Na = self.params['z'][0]
+            z_K = self.params['z'][1]
+            z_Cl = self.params['z'][2]
 
-        # split unknowns
-        alpha_i, Na_i, Na_e, K_i, K_e, Cl_i, Cl_e, \
-            phi_i, phi_e, p_e, c = df.split(w)
+            # split unknowns
+            alpha_i, Na_i, Na_e, K_i, K_e, Cl_i, Cl_e, \
+                phi_i, phi_e, p_e, c = df.split(w)
 
-        # membrane potential
-        phi_m = phi_i - phi_e
+            # membrane potential
+            phi_m = phi_i - phi_e
 
-        # reversal potentials
-        E_Na = R*temperature/(F*z_Na)*df.ln(Na_e/Na_i)  # sodium    - (V)
-        E_K = R*temperature/(F*z_K)*df.ln(K_e/K_i)      # potassium - (V)
-        E_Cl = R*temperature/(F*z_Cl)*df.ln(Cl_e/Cl_i)  # chloride  - (V)
+            # reversal potentials
+            E_Na = R*temperature/(F*z_Na)*df.ln(Na_e/Na_i)  # sodium    - (V)
+            E_K = R*temperature/(F*z_K)*df.ln(K_e/K_i)      # potassium - (V)
+            E_Cl = R*temperature/(F*z_Cl)*df.ln(Cl_e/Cl_i)  # chloride  - (V)
 
-        # membrane fluxes
-        j_leak_Na = self.j_leak_Na(phi_m, E_Na)
-        j_leak_Cl = self.j_leak_Cl(phi_m, E_Cl)
-        j_Kir = self.j_Kir(phi_m, E_K, K_e)
-        j_pump = self.j_pump(K_e, Na_i)
-        j_NBC = self.j_NBC(self, K_e, Na_i, HCO3_e, HCO3_i)
+            # membrane fluxes
+            j_leak_Na = self.j_leak_Na(phi_m, E_Na)
+            j_leak_Cl = self.j_leak_Cl(phi_m, E_Cl)
+            j_Kir = self.j_Kir(phi_m, E_K, K_e)
+            j_pump = self.j_pump(K_e, Na_i)
+            j_NBC = self.j_NBC(self, K_e, Na_i, HCO3_e, HCO3_i)
 
-        # total transmembrane ion fluxes
-        j_Na = j_leak_Na + 3.0*j_pump           # sodium    - (mol/(m^2s))
-        j_K = j_Kir - 2.0*j_pump                # potassium - (mol/(m^2s))
-        j_Cl = j_leak_Cl                        # chloride  - (mol/(m^2s))
-        j_HCO3 = -2*j_NBC                    
+            # total transmembrane ion fluxes
+            j_Na = j_leak_Na + 3.0*j_pump           # sodium    - (mol/(m^2s))
+            j_K = j_Kir - 2.0*j_pump                # potassium - (mol/(m^2s))
+            j_Cl = j_leak_Cl                        # chloride  - (mol/(m^2s))
+            j_HCO3 = -2*j_NBC                    
 
-        j_m = [j_Na, j_K, j_Cl, j_HCO3]
+            j_m = [j_Na, j_K, j_Cl, j_HCO3]
 
-        # set the membrane fluxes
-        self.membrane_fluxes = j_m
+            # set the membrane fluxes
+            self.membrane_fluxes = j_m
 
-        return
+            return
 
         def j_NBC(self, K_e, Na_i, HCO3_e, HCO3_i):
 
-        # get parameters
-        F = self.params['F']
-        R = self.params['R']
-        temperature = self.params['temperature']
-        z_Na = self.params['z'][0]
-        z_K = self.params['z'][1]
-        z_Cl = self.params['z'][2]
-        z_NBC = self.params['z'][4]
+            # get parameters
+            F = self.params['F']
+            R = self.params['R']
+            temperature = self.params['temperature']
+            z_Na = self.params['z'][0]
+            z_K = self.params['z'][1]
+            z_Cl = self.params['z'][2]
+            z_NBC = self.params['z'][4]
 
-        g_Na = self.params['g_Na']
-        g_K = self.params['g_K']
-        g_Cl = self.params['g_Cl']
-        g_NBC = self.params['g_NBC']
+            g_Na = self.params['g_Na']
+            g_K = self.params['g_K']
+            g_Cl = self.params['g_Cl']
+            g_NBC = self.params['g_NBC']
 
-        j_NaKATPase = j_pump(self, K_e, Na_i)
+            j_NaKATPase = j_pump(self, K_e, Na_i)
 
-        # set conductance
-        E_NBC = R*temperature/(F*z_NBC)*df.ln((Na_e*HCO3_e**2)/(Na_i*HCO3_i**2)) # NBC contransport reversal potential
+            # set conductance
+            E_NBC = R*temperature/(F*z_NBC)*df.ln((Na_e*HCO3_e**2)/(Na_i*HCO3_i**2)) # NBC contransport reversal potential
 
-        V_ m = (g_Na*E_Na + g_K*E_K + g_Cl*E_Cl + g_NBC*E_NBC - j_NaKATPase*F)/(g_Na + g_K + g_Cl + g_NBC)
+            V_m = (g_Na*E_Na + g_K*E_K + g_Cl*E_Cl + g_NBC*E_NBC - j_NaKATPase*F)/(g_Na + g_K + g_Cl + g_NBC)
 
-        j_NBC = g_NBC/F*(V_m - E_NBC)
+            j_NBC = g_NBC/F*(V_m - E_NBC)
 
-        return j_NBC
+            return j_NBC

@@ -3,7 +3,7 @@ import os
 import inspect
 
 # set path to solver
-from ffian.project_flow_models import ModelMC1, Solver
+from project_flow_models import modelMC1, Solver
 from plotter import Plotter
 
 
