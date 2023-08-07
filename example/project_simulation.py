@@ -3,7 +3,7 @@ import os
 import inspect
 
 # set path to solver
-from ffian.project_flow_models import modelMC1, Solver
+from ffian.project_flow_models import ModelMC1, Solver, ModelMC3
 from plotter import Plotter
 
 
@@ -51,7 +51,7 @@ def run_model(model_v, j_in, Tstop, stim_start, stim_end, stim_protocol):
 
 
 if __name__ == '__main__':
-    model_v = "MC1"             # Model (hypothesis) number
+    model_v = "MC3"             # Model (hypothesis) number
     j_in = 1.0e-6               # input constant (mol/(m^2s))
     Tstop = 30                  # duration of simulation (s)
     stim_start = 10             # stimulus onset (s)

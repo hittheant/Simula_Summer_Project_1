@@ -17,7 +17,7 @@ RUN mamba env update --file environment.yml --name dockerenv
 SHELL ["mamba", "run", "-n", "dockerenv", "/bin/bash", "-c"]
 
 # Install package
-COPY . ffian/ 
+COPY . ffian/
 RUN python3 -m pip install ./ffian
 
 RUN apt-get install -y texlive-latex-base texlive-latex-extra cm-super --no-install-recommends  dvipng
