@@ -78,23 +78,35 @@ class ModelMC3(ModelMC1):
             z_Na = self.params['z'][0]
             z_K = self.params['z'][1]
             z_Cl = self.params['z'][2]
+            z_NBC = self.params['z'][4]
+
+            g_Na = self.params['g_Na']
+            g_K = self.params['g_K']
+            g_Cl = self.params['g_Cl']
+            g_NBC = self.params['g_NBC']
+
 
             # split unknowns
-            alpha_i, Na_i, Na_e, K_i, K_e, Cl_i, Cl_e, \
+            alpha_i, Na_i, Na_e, K_i, K_e, Cl_i, Cl_e, HCO3_i, HCO3_e, \
                 phi_i, phi_e, p_e, c = df.split(w)
 
             # membrane potential
-            phi_m = phi_i - phi_e
+            # phi_m = phi_i - phi_e
 
             # reversal potentials
             E_Na = R*temperature/(F*z_Na)*df.ln(Na_e/Na_i)  # sodium    - (V)
             E_K = R*temperature/(F*z_K)*df.ln(K_e/K_i)      # potassium - (V)
             E_Cl = R*temperature/(F*z_Cl)*df.ln(Cl_e/Cl_i)  # chloride  - (V)
+            E_NBC = R*temperature/(F*z_NBC)*df.ln((Na_e*HCO3_e**2)/(Na_i*HCO3_i**2))
+
+            j_NaKATPase = j_pump(self, K_e, Na_i)
+
+            V_m = (g_Na*E_Na + g_K*E_K + g_Cl*E_Cl + g_NBC*E_NBC - j_NaKATPase*F)/(g_Na + g_K + g_Cl + g_NBC)
 
             # membrane fluxes
-            j_leak_Na = self.j_leak_Na(phi_m, E_Na)
-            j_leak_Cl = self.j_leak_Cl(phi_m, E_Cl)
-            j_Kir = self.j_Kir(phi_m, E_K, K_e)
+            j_leak_Na = self.j_leak_Na(V_m, E_Na)
+            j_leak_Cl = self.j_leak_Cl(V_m, E_Cl)
+            j_Kir = self.j_Kir(V_m, E_K, K_e)
             j_pump = self.j_pump(K_e, Na_i)
             j_NBC = self.j_NBC(self, K_e, Na_i, HCO3_e, HCO3_i)
 
