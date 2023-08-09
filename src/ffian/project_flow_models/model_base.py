@@ -66,6 +66,7 @@ class ModelBase():
         g_Na = df.Constant(1.0)            # sodium conductance [S/m^2]
         g_Cl = df.Constant(1)            # chloride conductance [S/m^2] THIS IS CHANGED
         g_K = df.Constant(16.96)           # potassium conductance [S/m^2]
+        g_KCC1 = df.Constant(7e-1)          # KCC1 conductance [S/m^2] THIS IS NEW BY NA
         rho_pump = df.Constant(1.12e-6)    # max pump rate [mol/(m^2s)]
         P_Nai = df.Constant(10.0)          # pump threshold - Na_i [mol/m^3]
         P_Ke = df.Constant(1.5)            # pump threshold - K_e [mol/m^3]
@@ -88,7 +89,7 @@ class ModelBase():
                   'gamma_m': gamma_m, 'K_m': K_m,
                   'D': D, 'z': z,
                   'lambdas': lambdas,
-                  'g_Na': g_Na, 'g_Cl': g_Cl, 'g_K': g_K,
+                  'g_Na': g_Na, 'g_Cl': g_Cl, 'g_K': g_K, 'g_KCC1': g_KCC1, # THIS IS NEW BY NA
                   'rho_pump': rho_pump, 'P_Ke': P_Ke, 'P_Nai': P_Nai,
                   'eta_m': eta_m, 'kappa': kappa,
                   'eps_r': eps_r, 'eps_zero': eps_zero,

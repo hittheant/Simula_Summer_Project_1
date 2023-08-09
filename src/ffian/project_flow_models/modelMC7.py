@@ -2,7 +2,7 @@ import dolfin as df
 from .model_base import ModelBase
 
 
-class ModelMC1(ModelBase):
+class ModelMC7(ModelBase):
     """ Model setup with input zone in the middle of the domain. """
 
     def __init__(self, model_v, mesh, L, t_PDE, j_in_const, stim_start, stim_end, stim_protocol='constant'):

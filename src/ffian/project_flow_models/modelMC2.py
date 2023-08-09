@@ -2,7 +2,7 @@ import dolfin as df
 from .model_base import ModelBase
 
 
-class ModelMC1(ModelBase):
+class ModelMC2(ModelBase):
     """ Model setup with input zone in the middle of the domain. """
 
     def __init__(self, model_v, mesh, L, t_PDE, j_in_const, stim_start, stim_end, stim_protocol='constant'):
@@ -67,6 +67,26 @@ class ModelMC1(ModelBase):
 
         return
     
+    def j_KCC1(self):
+        """ KCC1 co-transporter flux """
+        
+        #get parameters
+        F = self.params['F']
+        R = self.params['R']
+        temperature = self.params['temperature']
+        g_KCC1 = self.params['g_KCC1']
+        K_i_init = float(self.K_i_init)
+        K_e_init = float(self.K_e_init)
+        Cl_i_init = float(self.Cl_i_init)
+        Cl_e_init = float(self.Cl_e_init)
+        
+        #define and return flux (mol/(m^2*s))
+        
+        j_KCC1 = (g_KCC1 / F) * (R*temperature / F) * df.ln((K_e_init / K_i_init) * (Cl_e_init / Cl_i_init))
+        
+        return j_KCC1
+    
+    
     def set_membrane_fluxes(self, w):
         """ Set the transmembrane ion fluxes. """
 
@@ -95,11 +115,12 @@ class ModelMC1(ModelBase):
         j_leak_Cl = self.j_leak_Cl(phi_m, E_Cl)
         j_leak_K = self.j_leak_K(phi_m, E_K)
         j_pump = self.j_pump(K_e, Na_i)
+        j_KCC1 = self.j_KCC1()
 
         # total transmembrane ion fluxes
         j_Na = j_leak_Na + 3.0*j_pump           # sodium    - (mol/(m^2s))
-        j_K = j_leak_K - 2.0*j_pump                # potassium - (mol/(m^2s))
-        j_Cl = j_leak_Cl                        # chloride  - (mol/(m^2s))
+        j_K = j_leak_K - 2.0*j_pump + j_KCC1                # potassium - (mol/(m^2s))
+        j_Cl = j_leak_Cl + j_KCC1                        # chloride  - (mol/(m^2s))
 
         j_m = [j_Na, j_K, j_Cl]
 
@@ -107,3 +128,6 @@ class ModelMC1(ModelBase):
         self.membrane_fluxes = j_m
 
         return
+    
+        
+        
