@@ -1,11 +1,11 @@
 import dolfin as df
 from .model_base import ModelBase
-from ffian.project_flow_models import ModelMC1
 
 default_init_parameters = {"HCO3_i": "11.2",
                            "HCO3_e": "8.5"}
 
-class ModelMC3(ModelMC1):
+
+class ModelMC3(ModelBase):
     """ Model setup with input zone in the middle of the domain. """
     def __init__(self, model_v, mesh, L, t_PDE, j_in_const, stim_start, stim_end, stim_protocol='constant'):
         ModelBase.__init__(self, model_v, mesh, L, t_PDE)
