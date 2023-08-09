@@ -7,10 +7,18 @@ class ModelMC1(ModelBase):
 
     def __init__(self, model_v, mesh, L, t_PDE, j_in_const, stim_start, stim_end, stim_protocol='constant'):
         ModelBase.__init__(self, model_v, mesh, L, t_PDE)
-        self.stim_start = stim_start         # time of input onset (s)
-        self.stim_end = stim_end             # time of input offset (s)
-        self.j_in_const = j_in_const         # constant input in input zone (mol/(m^2s))
-        self.stim_protocol = stim_protocol   # stimulus protocol
+
+        # Stimulation Protocol
+        self.stim_start = stim_start  # time of input onset (s)
+        self.stim_end = stim_end  # time of input offset (s)
+        self.j_in_const = j_in_const  # constant input in input zone (mol/(m^2s))
+        self.stim_protocol = stim_protocol  # stimulus protocol
+
+        # set parameters and initial conditions
+        self.set_initial_conditions()
+        self.set_parameters()
+        # calculate and set immobile ions
+        self.set_immobile_ions()
 
     def j_in(self, t):
         """ Constant input flux. """

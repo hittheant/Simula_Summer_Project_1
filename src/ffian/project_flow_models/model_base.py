@@ -27,10 +27,6 @@ class ModelBase():
         self.N_comparts = 2         # number of compartments
         self.stim_protocol = None
 
-        # set parameters and initial conditions
-        self.set_initial_conditions()
-        self.set_parameters()
-
         return
 
     def set_parameters(self):
@@ -97,8 +93,6 @@ class ModelBase():
 
         # set physical parameters
         self.params = params
-        # calculate and set immobile ions
-        self.set_immobile_ions()
 
         return
 
