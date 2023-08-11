@@ -4,6 +4,7 @@ import matplotlib.colors as mcolors
 import matplotlib.cm as cm
 import numpy as np
 import dolfin as df
+import sys
 
 # set font & text parameters
 font = {'family': 'serif',
@@ -185,35 +186,47 @@ class Plotter():
                 p_ms.append(float(p_m))
                 phi_ms.append(phi_m)
 
+            # f = open('final_points.txt', "w")
+            print(f"alpha_i final = {dalpha_is[-1]}")
+            print(f"alpha_e final = {dalpha_es[-1]}")
+            print(f"Na_i final = {Na_is[-1]}")
+            print(f"Na_e final = {Na_es[-1]}")
+            print(f"K_i final = {K_is[-1]}")
+            print(f"K_e final = {K_es[-1]}")
+            print(f"Cl_i final = {Cl_is[-1]}")
+            print(f"Cl_i final = {Cl_es[-1]}")
+            print(f"phi_i final = {phi_i(point)}")
+            print(f"phi_e final = {phi_e(point)}")
+
             # create plot
             fig = plt.figure(figsize=(11*fs, 15*fs))
             ax = plt.gca()
 
-            ax1 = fig.add_subplot(4, 2, 1, xlim=xlim_T, ylim=[-0.25, 1.25])
+            ax1 = fig.add_subplot(4, 2, 1, xlim=xlim_T)#, ylim=[-0.25, 1.25])
             plt.ylabel(r'$j\mathrm{^K_{input}}$($\mu$mol/(m$^2$s))', fontsize=fosi)
             plt.plot(j_ins, color='k', linestyle='dotted', linewidth=lw)
 
-            ax2 = fig.add_subplot(4, 2, 2, xlim=xlim_T, ylim=[-0.25, 1.25])
+            ax2 = fig.add_subplot(4, 2, 2, xlim=xlim_T)#, ylim=[-0.25, 1.25])
             plt.ylabel(r'$j\mathrm{^K_{decay}}$($\mu$mol/(m$^2$s))', fontsize=fosi)
             plt.plot(j_decs, color='k', linewidth=lw)
 
-            ax3 = fig.add_subplot(4, 2, 3, xlim=xlim_T, ylim=[-15, 15])
+            ax3 = fig.add_subplot(4, 2, 3, xlim=xlim_T)#, ylim=[-15, 15])
             plt.ylabel(r'$\Delta [k]_\mathrm{e}$ (mM)', fontsize=fosi)
             plt.plot(np.array(Na_es)-Na_es[0], color=b0, label=r'Na$^+$', linewidth=lw)
             plt.plot(np.array(K_es)-K_es[0], color=b1, label=r'K$^+$', linestyle='dotted', linewidth=lw)
             plt.plot(np.array(Cl_es)-Cl_es[0], color=b2, label=r'Cl$^-$', linestyle='dashed', linewidth=lw)
 
-            ax4 = fig.add_subplot(4, 2, 4, xlim=xlim_T, ylim=[-15, 15])
+            ax4 = fig.add_subplot(4, 2, 4, xlim=xlim_T)#, ylim=[-15, 15])
             plt.ylabel(r'$\Delta [k]_\mathrm{i}$ (mM)', fontsize=fosi)
             plt.plot(np.array(Na_is)-Na_is[0], color=b0, linewidth=lw)
             plt.plot(np.array(K_is)-K_is[0], color=b1, linestyle='dotted', linewidth=lw)
             plt.plot(np.array(Cl_is)-Cl_is[0], color=b2, linestyle='dashed', linewidth=lw)
 
-            ax5 = fig.add_subplot(4, 2, 5, xlim=xlim_T, ylim=[-10, 10])
+            ax5 = fig.add_subplot(4, 2, 5, xlim=xlim_T)#, ylim=[-10, 10])
             plt.ylabel(r'$\Delta \alpha_\mathrm{e}$ (\%) ', fontsize=fosi)
             plt.plot(dalpha_es, color=c0, linewidth=lw)
 
-            ax6 = fig.add_subplot(4, 2, 6, xlim=xlim_T, ylim=[-10, 10])
+            ax6 = fig.add_subplot(4, 2, 6, xlim=xlim_T)#, ylim=[-10, 10])
             plt.ylabel(r'$\Delta \alpha_\mathrm{i}$ (\%) ', fontsize=fosi)
             plt.plot(dalpha_is, color=c0, linewidth=lw)
 
@@ -222,7 +235,7 @@ class Plotter():
             plt.plot(np.array(p_ms)-float(p_m_init), color=c2, linewidth=lw)
             plt.xlabel(r'time (s)', fontsize=fosi)
 
-            ax8 = fig.add_subplot(4, 2, 8, xlim=xlim_T, ylim=[-90, -60])
+            ax8 = fig.add_subplot(4, 2, 8, xlim=xlim_T)#, ylim=[-90, -60])
             plt.ylabel(r'$\phi_\mathrm{m}$ (mV)', fontsize=fosi)
             plt.plot(phi_ms, color=c1, linewidth=lw)
             plt.xlabel(r'time (s)', fontsize=fosi)
@@ -286,28 +299,28 @@ class Plotter():
             fig = plt.figure(figsize=(11*fs, 15*0.75*fs))
             ax = plt.gca()
 
-            ax1 = fig.add_subplot(3, 2, 1, xlim=xlim_T, ylim=[-0.25, 1.25])
+            ax1 = fig.add_subplot(3, 2, 1, xlim=xlim_T)#, ylim=[-0.25, 1.25])
             plt.ylabel(r'$j\mathrm{^K_{input}}$($\mu$mol/(m$^2$s))', fontsize=fosi)
             plt.plot(j_ins, color='k', linestyle='dotted', linewidth=lw)
 
-            ax2 = fig.add_subplot(3, 2, 2, xlim=xlim_T, ylim=[-0.25, 1.25])
+            ax2 = fig.add_subplot(3, 2, 2, xlim=xlim_T)#, ylim=[-0.25, 1.25])
             plt.ylabel(r'$j\mathrm{^K_{decay}}$($\mu$mol/(m$^2$s))', fontsize=fosi)
             plt.plot(j_decs, color='k', linewidth=lw)
 
-            ax3 = fig.add_subplot(3, 2, 3, xlim=xlim_T, ylim=[-30, 15])
+            ax3 = fig.add_subplot(3, 2, 3, xlim=xlim_T)#, ylim=[-30, 15])
             plt.ylabel(r'$\Delta [k]_\mathrm{e}$ (mM)', fontsize=fosi)
             plt.plot(np.array(Na_es)-Na_es[0], color=b0, label=r'Na$^+$', linewidth=lw)
             plt.plot(np.array(K_es)-K_es[0], color=b1, label=r'K$^+$', linestyle='dotted', linewidth=lw)
             plt.plot(np.array(Cl_es)-Cl_es[0], color=b2, label=r'Cl$^-$', linestyle='dashed', linewidth=lw)
 
-            ax4 = fig.add_subplot(3, 2, 4, xlim=xlim_T, ylim=[-30, 15])
+            ax4 = fig.add_subplot(3, 2, 4, xlim=xlim_T)#, ylim=[-30, 15])
             plt.ylabel(r'$\Delta [k]_\mathrm{i}$ (mM)', fontsize=fosi)
             plt.plot(np.array(Na_is)-Na_is[0], color=b0, linewidth=lw)
             plt.plot(np.array(K_is)-K_is[0], color=b1, linestyle='dotted', linewidth=lw)
             plt.plot(np.array(Cl_is)-Cl_is[0], color=b2, linestyle='dashed', linewidth=lw)
             plt.xlabel(r'time (s)', fontsize=fosi)
 
-            ax5 = fig.add_subplot(3, 2, 5, xlim=xlim_T, ylim=[-90, -60])
+            ax5 = fig.add_subplot(3, 2, 5, xlim=xlim_T)#, ylim=[-90, -60])
             plt.ylabel(r'$\phi_\mathrm{m}$ (mV)', fontsize=fosi)
             plt.plot(phi_ms, color=c1, linewidth=lw)
             plt.xlabel(r'time (s)', fontsize=fosi)
@@ -407,36 +420,36 @@ class Plotter():
             fig = plt.figure(figsize=(11*fs, 15*fs))
             ax = plt.gca()
 
-            ax1 = fig.add_subplot(4, 2, 1, xlim=xlim, ylim=[-0.25, 1.25])
+            ax1 = fig.add_subplot(4, 2, 1, xlim=xlim)#, ylim=[-0.25, 1.25])
             plt.xticks(xticks, xticklabels)
             plt.ylabel(r'$j\mathrm{^K_{input}}$($\mu$mol/(m$^2$s))', fontsize=fosi)
             df.plot(j_in, color='k', linestyle='dotted', linewidth=lw)
 
-            ax2 = fig.add_subplot(4, 2, 2, xlim=xlim, ylim=[-0.25, 1.25])
+            ax2 = fig.add_subplot(4, 2, 2, xlim=xlim)#, ylim=[-0.25, 1.25])
             plt.xticks(xticks, xticklabels)
             plt.ylabel(r'$j\mathrm{^K_{decay}}$($\mu$mol/(m$^2$s))', fontsize=fosi)
             df.plot(j_dec, color='k', linewidth=lw)
 
-            ax3 = fig.add_subplot(4, 2, 3, xlim=xlim, ylim=[-15, 15])
+            ax3 = fig.add_subplot(4, 2, 3, xlim=xlim)#, ylim=[-15, 15])
             plt.xticks(xticks, xticklabels)
             plt.ylabel(r'$\Delta [k]_\mathrm{e}$ (mM)', fontsize=fosi)
             df.plot(dNa_e, color=b0, label=r'Na$^+$', linewidth=lw)
             df.plot(dK_e, color=b1, label=r'K$^+$', linestyle='dotted', linewidth=lw)
             df.plot(dCl_e, color=b2, label=r'Cl$^-$', linestyle='dashed', linewidth=lw)
 
-            ax4 = fig.add_subplot(4, 2, 4, xlim=xlim, ylim=[-15, 15])
+            ax4 = fig.add_subplot(4, 2, 4, xlim=xlim)#, ylim=[-15, 15])
             plt.xticks(xticks, xticklabels)
             plt.ylabel(r'$\Delta [k]_\mathrm{i}$ (mM)', fontsize=fosi)
             df.plot(dNa_i, color=b0, linewidth=lw)
             df.plot(dK_i, color=b1, linestyle='dotted', linewidth=lw)
             df.plot(dCl_i, color=b2, linestyle='dashed', linewidth=lw)
 
-            ax5 = fig.add_subplot(4, 2, 5, xlim=xlim, ylim=[-10, 10])
+            ax5 = fig.add_subplot(4, 2, 5, xlim=xlim)#, ylim=[-10, 10])
             plt.xticks(xticks, xticklabels)
             plt.ylabel(r'$\Delta \alpha_\mathrm{e}$ (\%) ', fontsize=fosi)
             df.plot(dalpha_e, color=c0, linewidth=lw)
 
-            ax6 = fig.add_subplot(4, 2, 6, xlim=xlim, ylim=[-10, 10])
+            ax6 = fig.add_subplot(4, 2, 6, xlim=xlim)#, ylim=[-10, 10])
             plt.xticks(xticks, xticklabels)
             plt.ylabel(r'$\Delta \alpha_\mathrm{i}$ (\%) ', fontsize=fosi)
             df.plot(dalpha_i, color=c0, linewidth=lw)
@@ -447,7 +460,7 @@ class Plotter():
             df.plot(dp_m, color=c2, linewidth=lw)
             plt.xlabel(xlabel_x, fontsize=fosi)
 
-            ax8 = fig.add_subplot(4, 2, 8, xlim=xlim, ylim=[-90, -60])
+            ax8 = fig.add_subplot(4, 2, 8, xlim=xlim)#, ylim=[-90, -60])
             plt.xticks(xticks, xticklabels)
             plt.ylabel(r'$\phi_\mathrm{m}$ (mV)', fontsize=fosi)
             df.plot(phi_m, color=c1, linewidth=lw)
@@ -499,24 +512,24 @@ class Plotter():
             fig = plt.figure(figsize=(11*fs, 15*0.75*fs))
             ax = plt.gca()
 
-            ax1 = fig.add_subplot(3, 2, 1, xlim=xlim, ylim=[-0.25, 1.25])
+            ax1 = fig.add_subplot(3, 2, 1, xlim=xlim)#, ylim=[-0.25, 1.25])
             plt.xticks(xticks, xticklabels)
             plt.ylabel(r'$j\mathrm{^K_{input}}$($\mu$mol/(m$^2$s))', fontsize=fosi)
             df.plot(j_in, color='k', linestyle='dotted', linewidth=lw)
 
-            ax2 = fig.add_subplot(3, 2, 2, xlim=xlim, ylim=[-0.25, 1.25])
+            ax2 = fig.add_subplot(3, 2, 2, xlim=xlim)#, ylim=[-0.25, 1.25])
             plt.xticks(xticks, xticklabels)
             plt.ylabel(r'$j\mathrm{^K_{decay}}$($\mu$mol/(m$^2$s))', fontsize=fosi)
             df.plot(j_dec, color='k', linewidth=lw)
 
-            ax3 = fig.add_subplot(3, 2, 3, xlim=xlim, ylim=[-30, 15])
+            ax3 = fig.add_subplot(3, 2, 3, xlim=xlim)#, ylim=[-30, 15])
             plt.xticks(xticks, xticklabels)
             plt.ylabel(r'$\Delta [k]_\mathrm{e}$ (mM)', fontsize=fosi)
             df.plot(dNa_e, color=b0, label=r'Na$^+$', linewidth=lw)
             df.plot(dK_e, color=b1, label=r'K$^+$', linestyle='dotted', linewidth=lw)
             df.plot(dCl_e, color=b2, label=r'Cl$^-$', linestyle='dashed', linewidth=lw)
 
-            ax4 = fig.add_subplot(3, 2, 4, xlim=xlim, ylim=[-30, 15])
+            ax4 = fig.add_subplot(3, 2, 4, xlim=xlim)#, ylim=[-30, 15])
             plt.xticks(xticks, xticklabels)
             plt.xlabel(xlabel_x, fontsize=fosi)
             plt.ylabel(r'$\Delta [k]_\mathrm{i}$ (mM)', fontsize=fosi)
@@ -524,7 +537,7 @@ class Plotter():
             df.plot(dK_i, color=b1, linestyle='dotted', linewidth=lw)
             df.plot(dCl_i, color=b2, linestyle='dashed', linewidth=lw)
 
-            ax5 = fig.add_subplot(3, 2, 5, xlim=xlim, ylim=[-90, -60])
+            ax5 = fig.add_subplot(3, 2, 5, xlim=xlim)#, ylim=[-90, -60])
             plt.xticks(xticks, xticklabels)
             plt.xlabel(xlabel_x, fontsize=fosi)
             plt.ylabel(r'$\phi_\mathrm{m}$ (mV)', fontsize=fosi)
@@ -549,10 +562,10 @@ class Plotter():
             ax.spines['top'].set_visible(False)
 
         plt.tight_layout()
-
+        print("creating space plots")
         # save figure to file
         fname_res = path_figs + 'spaceplot_' + model_v
         plt.savefig(fname_res + '.pdf', format='pdf')
         plt.close()
-
+        print("end")
         return

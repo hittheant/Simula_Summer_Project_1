@@ -3,7 +3,8 @@ import os
 import inspect
 
 # set path to solver
-from ffian.project_flow_models import ModelMC1, ModelMC2, ModelMC3, ModelMC4, ModelMC5, ModelMC7, Solver
+from ffian.project_flow_models import ModelMC1, ModelMC2, ModelMC3, ModelMC4, \
+    ModelMC5, ModelMC6, ModelMC7, Solver
 from plotter import Plotter
 
 
@@ -24,7 +25,7 @@ def run_model(model_v, j_in, Tstop, stim_start, stim_end, stim_protocol):
     mesh = df.IntervalMesh(N, 0, L)          # create mesh
 
     # time variables
-    dt_value = 1e-3                          # time step (s)
+    dt_value = 1e-2                          # time step (s)
 
     # model setup
     t_PDE = df.Constant(0.0)  # time constant
@@ -51,11 +52,11 @@ def run_model(model_v, j_in, Tstop, stim_start, stim_end, stim_protocol):
 
 
 if __name__ == '__main__':
-    model_v = "MC5"             # Model (hypothesis) number
+    model_v = "MC1"             # Model (hypothesis) number
     j_in = 0                    # input constant (mol/(m^2s))
-    Tstop = 4                   # duration of simulation (s)
-    stim_start = 2              # stimulus onset (s)
-    stim_end = 3                # stimulus offset (s)
+    Tstop = 300                   # duration of simulation (s)
+    stim_start = 32              # stimulus onset (s)
+    stim_end = 35                # stimulus offset (s)
     stim_protocol = 'constant'  # stimulues protocol ('constant', 'slow', or 'ultraslow')
 
     # run model
@@ -71,4 +72,4 @@ if __name__ == '__main__':
 
     # plot figures
     P.timeplot(path_figs, model_v, Tstop)
-    P.spaceplot(path_figs, model_v, stim_end)
+    P.spaceplot(path_figs, model_v, Tstop)
