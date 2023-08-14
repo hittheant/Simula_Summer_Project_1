@@ -1,8 +1,20 @@
 import dolfin as df
 from .model_base import ModelBase
 
-default_init_parameters = {"HCO3_i": "11.2",
-                           "HCO3_e": "8.5"}
+# default_init_parameters = {"HCO3_i": "11.2",
+#                            "HCO3_e": "8.5"}
+default_init_parameters = {"alpha_i": "0.4",
+                           "alpha_e": "0.2",
+                           "Na_i": "14.872969584642725",
+                           "K_i": "98.52063389964302",
+                           "Cl_i": "3.691088150654625",
+                           "HCO3_i": "8.525956640279082",
+                           "Na_e": "149.17352263058513",
+                           "K_e": "3.0392704008382467",
+                           "Cl_e": "136.61782369869186",
+                           "HCO3_e": "13.848086719442074",
+                           "phi_i": "-0.08468533324616204",
+                           "phi_e": "0.0"}
 
 
 class ModelMC5(ModelBase):
@@ -84,8 +96,8 @@ class ModelMC5(ModelBase):
 
     def set_initial_conditions(self, options: dict = None):
         """ Set initial conditions """
-        ModelBase.set_initial_conditions(self)
         in_options = default_init_parameters.copy()
+        ModelBase.set_initial_conditions(self, in_options)
 
         self.HCO3_i_init = in_options['HCO3_i'] # ICS HCO3 [mol/m^3]
         self.HCO3_e_init = in_options['HCO3_e'] # ECS HCO3 [mol/m^3]
@@ -201,12 +213,12 @@ class ModelMC5(ModelBase):
         j_leak_K = self.j_leak_K(phi_m, E_K)
         j_pump = self.j_pump(K_e, Na_i)
         j_NBC = self.j_NBC(phi_m, E_NBC)
-        j_NKCC1 = self.j_NKCC1(w, Na_i, Na_e, K_i, K_e, Cl_i, Cl_e)
+        j_NKCC1 = self.j_NKCC1(Na_i, Na_e, K_i, K_e, Cl_i, Cl_e)
 
         # total transmembrane ion fluxes
-        j_Na = j_leak_Na + 3.0 * j_pump - j_NKCC1           # sodium    - (mol/(m^2s))
-        j_K = j_leak_K - 2.0 * j_pump - j_NKCC1              # potassium - (mol/(m^2s))
-        j_Cl = j_leak_Cl - 2.0 * j_NKCC1                       # chloride  - (mol/(m^2s))
+        j_Na = j_leak_Na + 3.0 * j_pump - j_NKCC1               # sodium    - (mol/(m^2s))
+        j_K = j_leak_K - 2.0 * j_pump - j_NKCC1                 # potassium - (mol/(m^2s))
+        j_Cl = j_leak_Cl - 2.0 * j_NKCC1                        # chloride  - (mol/(m^2s))
         j_HCO3 = -2.0 * j_NBC
 
         j_m = [j_Na, j_K, j_Cl, j_HCO3]
@@ -226,7 +238,7 @@ class ModelMC5(ModelBase):
 
         return j_NBC
 
-    def j_NKCC1(self, w, Na_i, Na_e, K_i, K_e, Cl_i, Cl_e):
+    def j_NKCC1(self, Na_i, Na_e, K_i, K_e, Cl_i, Cl_e):
         " " " Ion fluxes through NKCC1. " " "
 
         # # split unknowns into components

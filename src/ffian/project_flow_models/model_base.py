@@ -4,13 +4,13 @@ import dolfin as df
 
 default_init_parameters = {"alpha_i": "0.4",
                            "alpha_e": "0.2",
-                           "Na_i": "15.474585472970270",
-                           "K_i": "99.892102216365814",
-                           "Cl_i": "5.363687689337043",
-                           "Na_e": "144.090829054058730",
-                           "K_e": "3.215795567266669",
-                           "Cl_e": "133.272624621326230",
-                           "phi_i": "-0.085861202415139",
+                           "Na_i": "15.510234830675616",
+                           "K_i": "99.19015487718889",
+                           "Cl_i": "5.064077397202017",
+                           "Na_e": "146.5802367864952",
+                           "K_e": "3.018983797774815",
+                           "Cl_e": "133.87184520559637",
+                           "phi_i": "-0.08466809466757282",
                            "phi_e": "0.0"}
 
 
@@ -33,9 +33,9 @@ class ModelBase():
         """ Set the model's physical parameters """
 
         # physical model parameters
-        temperature = df.Constant(310.15)  # temperature [K]
-        F = df.Constant(96485.3)           # Faraday's constant [C/mol]
-        R = df.Constant(8.314)             # gas constant [J/(mol*K)]
+        temperature = df.Constant(300)  # temperature [K]
+        F = df.Constant(96490)           # Faraday's constant [C/mol]
+        R = df.Constant(8.315)             # gas constant [J/(mol*K)]
 
         # diffusion coefficients
         D_Na = df.Constant(1.33e-9)        # sodium [m^2/s]
@@ -65,7 +65,8 @@ class ModelBase():
         rho_pump = df.Constant(1.12e-6)    # max pump rate [mol/(m^2s)]
         P_Nai = df.Constant(10.0)          # pump threshold - Na_i [mol/m^3]
         P_Ke = df.Constant(1.5)            # pump threshold - K_e [mol/m^3]
-        eta_m = df.Constant(8.14e-14)      # membrane water permeab. [m/(Pa*s)]
+        # eta_m = df.Constant(8.14e-14)      # membrane water permeab. [m/(Pa*s)]
+        eta_m = df.Constant(0)  # membrane water permeab. [m/(Pa*s)]
 
         # compartmental fluid flow parameters
         kappa_i = df.Constant(1.8375e-14)  # ICS water permeability [m^4/(N*s)]

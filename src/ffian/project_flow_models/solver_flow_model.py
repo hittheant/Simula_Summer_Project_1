@@ -228,6 +228,9 @@ class Solver():
         # transmembrane water flux
         w_m = eta_m*w_m
 
+        if self.model.model_v == 'MC6':
+            w_m += self.model.water_active_transport_flux
+
         # form for ICS volume fraction
         A_alpha_i += 1.0/self.dt*df.inner(alpha_i - alpha_i_, v_alpha_i)*df.dx \
                        - df.inner(alpha_i*u_i, df.grad(v_alpha_i))*df.dx \

@@ -1,6 +1,17 @@
 import dolfin as df
 from .model_base import ModelBase
 
+default_init_parameters = {"alpha_i": "0.4",
+                           "alpha_e": "0.2",
+                           "Na_i": "15.510234830675616",
+                           "K_i": "99.19015487718889",
+                           "Cl_i": "5.064077397202017",
+                           "Na_e": "146.5802367864952",
+                           "K_e": "3.018983797774815",
+                           "Cl_e": "133.87184520559637",
+                           "phi_i": "-0.08466809466757282",
+                           "phi_e": "0.0"}
+
 
 class ModelMC4(ModelBase):
     def __init__(self, model_v, mesh, L, t_PDE, j_in_const, stim_start, stim_end, stim_protocol='constant'):
@@ -23,6 +34,10 @@ class ModelMC4(ModelBase):
         self.params['g_NKCC1'] = g_NKCC1
 
         return
+
+    def set_initial_conditions(self, options: dict = None):
+        in_options = default_init_parameters.copy()
+        ModelBase.set_initial_conditions(self, in_options)
 
     def j_in(self, t):
         """ Constant input flux. """

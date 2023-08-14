@@ -1,6 +1,16 @@
 import dolfin as df
 from .model_base import ModelBase
 
+default_init_parameters = {"alpha_i": "0.4",
+                           "alpha_e": "0.2",
+                           "Na_i": "15.975837695434075",
+                           "K_i": "101.80296517317167",
+                           "Cl_i": "8.12807532557512",
+                           "Na_e": "140.58782684238298",
+                           "K_e": "2.8545674204086646",
+                           "Cl_e": "127.74384934885104",
+                           "phi_i": "-0.08591650458459495",
+                           "phi_e": "0.0"}
 
 class ModelMC2(ModelBase):
     """ Model setup with input zone in the middle of the domain. """
@@ -21,6 +31,14 @@ class ModelMC2(ModelBase):
         ModelBase.set_parameters(self)
         g_KCC1 = df.Constant(7e-1)
         self.params['g_KCC1'] = g_KCC1
+
+    def set_initial_conditions(self, options: dict = None):
+        """ Set initial conditions """
+
+        in_options = default_init_parameters.copy()
+        ModelBase.set_initial_conditions(self, in_options)
+
+        return
 
     def j_in(self, t):
         """ Constant input flux. """

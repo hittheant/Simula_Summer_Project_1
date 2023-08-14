@@ -1,9 +1,21 @@
 import dolfin as df
 from .model_base import ModelBase
 
-default_init_parameters = {"HCO3_i": "11.2",
-                           "HCO3_e": "8.5"}
 
+# default_init_parameters = {"HCO3_i": "11.2",
+#                            "HCO3_e": "8.5"}
+default_init_parameters = {"alpha_i": "0.4",
+                           "alpha_e": "0.2",
+                           "Na_i": "15.510281172306579",
+                           "K_i": "99.18951634974886",
+                           "Cl_i": "5.064058134333789",
+                           "HCO3_i": "8.415887810925824",
+                           "Na_e": "146.58022949539213",
+                           "K_e": "3.02017546049593",
+                           "Cl_e": "133.87188373133282",
+                           "HCO3_e": "14.068224378148397",
+                           "phi_i": "-0.08465790884483847",
+                           "phi_e": "0.0"}
 
 class ModelMC3(ModelBase):
     """ Model setup with input zone in the middle of the domain. """
@@ -82,8 +94,10 @@ class ModelMC3(ModelBase):
 
     def set_initial_conditions(self, options: dict = None):
         """ Set initial conditions """
-        ModelBase.set_initial_conditions(self)
+
         in_options = default_init_parameters.copy()
+
+        ModelBase.set_initial_conditions(self, in_options)
 
         self.HCO3_i_init = in_options['HCO3_i'] # ICS HCO3 [mol/m^3]
         self.HCO3_e_init = in_options['HCO3_e'] # ECS HCO3 [mol/m^3]

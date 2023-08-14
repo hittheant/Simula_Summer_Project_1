@@ -1,6 +1,16 @@
 import dolfin as df
 from .model_base import ModelBase
 
+default_init_parameters = {"alpha_i": "0.4",
+                           "alpha_e": "0.2",
+                           "Na_i": "15.510234830675616",
+                           "K_i": "99.19015487718889",
+                           "Cl_i": "5.064077397202017",
+                           "Na_e": "146.5802367864952",
+                           "K_e": "3.018983797774815",
+                           "Cl_e": "133.87184520559637",
+                           "phi_i": "-0.08466809466757282",
+                           "phi_e": "0.0"}
 
 class ModelMC7(ModelBase):
     """ Model setup with input zone in the middle of the domain. """
