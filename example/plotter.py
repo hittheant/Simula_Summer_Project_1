@@ -1,3 +1,4 @@
+import pickle
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
@@ -126,6 +127,7 @@ class Plotter():
         # list of function values at point
         j_ins = []
         j_decs = []
+        j_pumps = []
         Na_is = []
         K_is = []
         Cl_is = []
@@ -164,8 +166,10 @@ class Plotter():
             # get input/decay fluxes
             j_in_ = self.model.j_in(n)
             j_dec_ = self.model.j_dec(K_e)
+            j_pump_ = self.model.j_pump(K_e, Na_i)
             j_in = self.project_to_function_space(j_in_*1e6)    # convert to umol/(m^2s)
             j_dec = self.project_to_function_space(j_dec_*1e6)  # convert to umol/(m^2s)
+            j_pump = self.project_to_function_space(j_pump_*1e6)# convert to umol/(m^2s)
 
             # calculate change in volume fractions
             alpha_i_diff = (alpha_i(point) - alpha_i_init)/alpha_i_init*100
@@ -181,6 +185,7 @@ class Plotter():
             # append data to lists
             j_ins.append(j_in(point))
             j_decs.append(j_dec(point))
+            j_pumps.append(j_pump(point))
             Na_is.append(Na_i(point))
             K_is.append(K_i(point))
             Cl_is.append(Cl_i(point))
@@ -205,24 +210,25 @@ class Plotter():
         print(f"Cl_i final = {Cl_is[-1]}")
         print(f"Cl_i final = {Cl_es[-1]}")
         if model_v == 'MC3' or model_v == 'MC5':
-            print(f"HCO3_i final = {HCO3_i(point)}")
-            print(f"HCO3_e final = {HCO3_e(point)}")
+            print(f"HCO3_i final = {HCO3_is[-1]}")
+            print(f"HCO3_e final = {HCO3_es[-1]}")
         print(f"phi_i final = {phi_i(point)}")
         print(f"phi_e final = {phi_e(point)}")
+        print(f"j_pump final = {j_pumps[-1]}")
 
         # create plot
         fig = plt.figure(figsize=(11*fs, 15*fs))
         ax = plt.gca()
 
-        ax1 = fig.add_subplot(4, 2, 1, xlim=xlim_T)#, ylim=[-0.25, 1.25])
+        ax1 = fig.add_subplot(4, 2, 1, xlim=xlim_T, ylim=[-0.25, 1.25])
         plt.ylabel(r'$j\mathrm{^K_{input}}$($\mu$mol/(m$^2$s))', fontsize=fosi)
         plt.plot(j_ins, color='k', linestyle='dotted', linewidth=lw)
 
-        ax2 = fig.add_subplot(4, 2, 2, xlim=xlim_T)#, ylim=[-0.25, 1.25])
+        ax2 = fig.add_subplot(4, 2, 2, xlim=xlim_T, ylim=[-0.25, 1.25])
         plt.ylabel(r'$j\mathrm{^K_{decay}}$($\mu$mol/(m$^2$s))', fontsize=fosi)
         plt.plot(j_decs, color='k', linewidth=lw)
 
-        ax3 = fig.add_subplot(4, 2, 3, xlim=xlim_T)#, ylim=[-15, 15])
+        ax3 = fig.add_subplot(4, 2, 3, xlim=xlim_T, ylim=[-15, 10])
         plt.ylabel(r'$\Delta [k]_\mathrm{e}$ (mM)', fontsize=fosi)
         plt.plot(np.array(Na_es)-Na_es[0], color=b0, label=r'Na$^+$', linewidth=lw)
         plt.plot(np.array(K_es)-K_es[0], color=b1, label=r'K$^+$', linestyle='dotted', linewidth=lw)
@@ -230,7 +236,7 @@ class Plotter():
         if model_v == 'MC3' or model_v == 'MC5':
             plt.plot(np.array(HCO3_es) - HCO3_es[0], color=b3, label=f'HCO$_3^-$', linestyle='dashdot', linewidth=lw)
 
-        ax4 = fig.add_subplot(4, 2, 4, xlim=xlim_T)#, ylim=[-15, 15])
+        ax4 = fig.add_subplot(4, 2, 4, xlim=xlim_T, ylim=[-15, 15])
         plt.ylabel(r'$\Delta [k]_\mathrm{i}$ (mM)', fontsize=fosi)
         plt.plot(np.array(Na_is)-Na_is[0], color=b0, linewidth=lw)
         plt.plot(np.array(K_is)-K_is[0], color=b1, linestyle='dotted', linewidth=lw)
@@ -238,11 +244,11 @@ class Plotter():
         if model_v == 'MC3' or model_v == 'MC5':
             plt.plot(np.array(HCO3_is) - HCO3_is[0], color=b3, linestyle='dashdot', linewidth=lw)
 
-        ax5 = fig.add_subplot(4, 2, 5, xlim=xlim_T)#, ylim=[-10, 10])
+        ax5 = fig.add_subplot(4, 2, 5, xlim=xlim_T, ylim=[-15, 15])
         plt.ylabel(r'$\Delta \alpha_\mathrm{e}$ (\%) ', fontsize=fosi)
         plt.plot(dalpha_es, color=c0, linewidth=lw)
 
-        ax6 = fig.add_subplot(4, 2, 6, xlim=xlim_T)#, ylim=[-10, 10])
+        ax6 = fig.add_subplot(4, 2, 6, xlim=xlim_T, ylim=[-15, 15])
         plt.ylabel(r'$\Delta \alpha_\mathrm{i}$ (\%) ', fontsize=fosi)
         plt.plot(dalpha_is, color=c0, linewidth=lw)
 
@@ -251,12 +257,12 @@ class Plotter():
         plt.plot(np.array(p_ms)-float(p_m_init), color=c2, linewidth=lw)
         plt.xlabel(r'time (s)', fontsize=fosi)
 
-        ax8 = fig.add_subplot(4, 2, 8, xlim=xlim_T)#, ylim=[-90, -60])
+        ax8 = fig.add_subplot(4, 2, 8, xlim=xlim_T, ylim=[-90, -60])
         plt.ylabel(r'$\phi_\mathrm{m}$ (mV)', fontsize=fosi)
         plt.plot(phi_ms, color=c1, linewidth=lw)
         plt.xlabel(r'time (s)', fontsize=fosi)
 
-        plt.figlegend(bbox_to_anchor=(0.26, 0.76), frameon=True)
+        plt.figlegend(bbox_to_anchor=(0.49, 0.63), frameon=True)
 
         axes = [ax1, ax2, ax3, ax4, ax5, ax6, ax7, ax8]
 
@@ -273,6 +279,18 @@ class Plotter():
             # make pretty
             ax.spines['right'].set_visible(False)
             ax.spines['top'].set_visible(False)
+
+        # obj0, obj1, obj2 are created here...
+
+        # Saving the objects:
+
+        dump_list = [j_ins, j_decs, dalpha_es, dalpha_is,
+                     Na_is, Na_es, K_is, K_es, Cl_is, Cl_es]
+        if model_v == 'MC3' or model_v == 'MC5':
+            dump_list.extend([HCO3_is, HCO3_es])
+        dump_list.extend([p_ms, phi_ms, j_pumps])
+        with open(f'{model_v}_timedata.pkl', 'wb') as f:  # Python 3: open(..., 'wb')
+            pickle.dump(dump_list, f)
 
         plt.tight_layout()
         # save figure to file
@@ -361,17 +379,17 @@ class Plotter():
         fig = plt.figure(figsize=(11*fs, 15*fs))
         ax = plt.gca()
 
-        ax1 = fig.add_subplot(4, 2, 1, xlim=xlim)#, ylim=[-0.25, 1.25])
+        ax1 = fig.add_subplot(4, 2, 1, xlim=xlim, ylim=[-0.25, 1.25])
         plt.xticks(xticks, xticklabels)
         plt.ylabel(r'$j\mathrm{^K_{input}}$($\mu$mol/(m$^2$s))', fontsize=fosi)
         df.plot(j_in, color='k', linestyle='dotted', linewidth=lw)
 
-        ax2 = fig.add_subplot(4, 2, 2, xlim=xlim)#, ylim=[-0.25, 1.25])
+        ax2 = fig.add_subplot(4, 2, 2, xlim=xlim, ylim=[-0.25, 1.25])
         plt.xticks(xticks, xticklabels)
         plt.ylabel(r'$j\mathrm{^K_{decay}}$($\mu$mol/(m$^2$s))', fontsize=fosi)
         df.plot(j_dec, color='k', linewidth=lw)
 
-        ax3 = fig.add_subplot(4, 2, 3, xlim=xlim)#, ylim=[-15, 15])
+        ax3 = fig.add_subplot(4, 2, 3, xlim=xlim, ylim=[-15, 15])
         plt.xticks(xticks, xticklabels)
         plt.ylabel(r'$\Delta [k]_\mathrm{e}$ (mM)', fontsize=fosi)
         df.plot(dNa_e, color=b0, label=r'Na$^+$', linewidth=lw)
@@ -380,7 +398,7 @@ class Plotter():
         if model_v == 'MC3' or model_v == 'MC5':
             df.plot(dHCO3_e, color=b3, label=r'HCO$_3^-$', linestyle='dashdot', linewidth=lw)
 
-        ax4 = fig.add_subplot(4, 2, 4, xlim=xlim)#, ylim=[-15, 15])
+        ax4 = fig.add_subplot(4, 2, 4, xlim=xlim, ylim=[-15, 15])
         plt.xticks(xticks, xticklabels)
         plt.ylabel(r'$\Delta [k]_\mathrm{i}$ (mM)', fontsize=fosi)
         df.plot(dNa_i, color=b0, linewidth=lw)
@@ -389,12 +407,12 @@ class Plotter():
         if model_v == 'MC3' or model_v == 'MC5':
             df.plot(dHCO3_i, color=b3, linestyle='dashdot', linewidth=lw)
 
-        ax5 = fig.add_subplot(4, 2, 5, xlim=xlim)#, ylim=[-10, 10])
+        ax5 = fig.add_subplot(4, 2, 5, xlim=xlim, ylim=[-15, 15])
         plt.xticks(xticks, xticklabels)
         plt.ylabel(r'$\Delta \alpha_\mathrm{e}$ (\%) ', fontsize=fosi)
         df.plot(dalpha_e, color=c0, linewidth=lw)
 
-        ax6 = fig.add_subplot(4, 2, 6, xlim=xlim)#, ylim=[-10, 10])
+        ax6 = fig.add_subplot(4, 2, 6, xlim=xlim, ylim=[-15, 15])
         plt.xticks(xticks, xticklabels)
         plt.ylabel(r'$\Delta \alpha_\mathrm{i}$ (\%) ', fontsize=fosi)
         df.plot(dalpha_i, color=c0, linewidth=lw)
@@ -405,7 +423,7 @@ class Plotter():
         df.plot(dp_m, color=c2, linewidth=lw)
         plt.xlabel(xlabel_x, fontsize=fosi)
 
-        ax8 = fig.add_subplot(4, 2, 8, xlim=xlim)#, ylim=[-90, -60])
+        ax8 = fig.add_subplot(4, 2, 8, xlim=xlim, ylim=[-90, -60])
         plt.xticks(xticks, xticklabels)
         plt.ylabel(r'$\phi_\mathrm{m}$ (mV)', fontsize=fosi)
         df.plot(phi_m, color=c1, linewidth=lw)

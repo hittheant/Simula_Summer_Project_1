@@ -52,12 +52,12 @@ def run_model(model_v, j_in, Tstop, stim_start, stim_end, stim_protocol):
 
 
 if __name__ == '__main__':
-    model_v = "MC2"             # Model (hypothesis) number
-    j_in = 0                    # input constant (mol/(m^2s))
-    Tstop = 30                   # duration of simulation (s)
-    stim_start = 5032              # stimulus onset (s)
-    stim_end = 5035                # stimulus offset (s)
-    stim_protocol = 'constant'  # stimulues protocol ('constant', 'slow', or 'ultraslow')
+    model_v = "MC3"              # Model (hypothesis) number
+    j_in = 1.0e-6                # input constant (mol/(m^2s))
+    Tstop = 60                   # duration of simulation (s)
+    stim_start = 10              # stimulus onset (s)
+    stim_end = 20                # stimulus offset (s)
+    stim_protocol = 'constant'   # stimulus protocol ('constant', 'slow', or 'ultraslow')
 
     # run model
     model, path_data = run_model(model_v, j_in, Tstop, stim_start, stim_end, stim_protocol)
@@ -72,4 +72,4 @@ if __name__ == '__main__':
 
     # plot figures
     P.timeplot(path_figs, model_v, Tstop)
-    P.spaceplot(path_figs, model_v, Tstop)
+    P.spaceplot(path_figs, model_v, stim_end)
