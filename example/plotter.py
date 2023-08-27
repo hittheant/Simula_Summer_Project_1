@@ -283,13 +283,13 @@ class Plotter():
         # obj0, obj1, obj2 are created here...
 
         # Saving the objects:
-
-        dump_list = [j_ins, j_decs, dalpha_es, dalpha_is,
+        fname_pickled_data = 'results/stimulation_data/timedata/' + model_v + '.pkl'
+        dump_list = [j_ins, j_decs, dalpha_is, dalpha_es,
                      Na_is, Na_es, K_is, K_es, Cl_is, Cl_es]
         if model_v == 'MC3' or model_v == 'MC5':
             dump_list.extend([HCO3_is, HCO3_es])
         dump_list.extend([p_ms, phi_ms, j_pumps])
-        with open(f'{model_v}_timedata.pkl', 'wb') as f:  # Python 3: open(..., 'wb')
+        with open(fname_pickled_data, 'wb') as f:  # Python 3: open(..., 'wb')
             pickle.dump(dump_list, f)
 
         plt.tight_layout()
@@ -453,5 +453,14 @@ class Plotter():
         fname_res = path_figs + 'spaceplot_' + model_v
         plt.savefig(fname_res + '.pdf', format='pdf')
         plt.close()
+
+        # fname_pickled_data = 'results/stimulation_data/spacedata/' + model_v + '.pkl'
+        # dump_list = [j_in, j_dec, dalpha_i, dalpha_e,
+        #              dNa_i, dNa_e, dK_i, dK_e, dCl_i, dCl_e]
+        # if model_v == 'MC3' or model_v == 'MC5':
+        #     dump_list.extend([dHCO3_i, dHCO3_e])
+        # dump_list.extend([dp_m, phi_m])
+        # with open(fname_pickled_data, 'wb') as f:  # Python 3: open(..., 'wb')
+        #     pickle.dump(dump_list, f)
         print("end")
         return

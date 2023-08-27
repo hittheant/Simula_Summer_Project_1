@@ -6,15 +6,15 @@ from .model_base import ModelBase
 #                            "HCO3_e": "8.5"}
 default_init_parameters = {"alpha_i": "0.4",
                            "alpha_e": "0.2",
-                           "Na_i": "15.510281172306579",
-                           "K_i": "99.18951634974886",
-                           "Cl_i": "5.064058134333789",
-                           "HCO3_i": "8.415887810925824",
-                           "Na_e": "146.58022949539213",
-                           "K_e": "3.02017546049593",
-                           "Cl_e": "133.87188373133282",
-                           "HCO3_e": "14.068224378148397",
-                           "phi_i": "-0.08465790884483847",
+                           "Na_i": "15.510185113668564",
+                           "K_i": "99.18951810235991",
+                           "Cl_i": "5.064059582797311",
+                           "HCO3_i": "8.415729973700852",
+                           "Na_e": "146.58042154841118",
+                           "K_e": "3.02017201953078",
+                           "Cl_e": "133.87188083440577",
+                           "HCO3_e": "14.06854005259834",
+                           "phi_i": "-0.08465895949780111",
                            "phi_e": "0.0"}
 
 class ModelMC3(ModelBase):
@@ -215,7 +215,7 @@ class ModelMC3(ModelBase):
         j_NBC = self.j_NBC(phi_m, E_NBC)
 
         # total transmembrane ion fluxes
-        j_Na = j_leak_Na + 3.0*j_pump           # sodium    - (mol/(m^2s))
+        j_Na = j_leak_Na + 3.0*j_pump - j_NBC           # sodium    - (mol/(m^2s))
         j_K = j_leak_K - 2.0*j_pump                # potassium - (mol/(m^2s))
         j_Cl = j_leak_Cl                        # chloride  - (mol/(m^2s))
         j_HCO3 = -2.0 * j_NBC

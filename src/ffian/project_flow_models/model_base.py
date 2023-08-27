@@ -13,6 +13,17 @@ default_init_parameters = {"alpha_i": "0.4",
                            "phi_i": "-0.08466809466757282",
                            "phi_e": "0.0"}
 
+# initial_init_parameters = {"alpha_i": "0.4",
+#                            "alpha_e": "0.2",
+#                            "Na_i": "15",
+#                            "K_i": "100",
+#                            "Cl_i": "6",
+#                            "Na_e": "146",
+#                            "K_e": "3",
+#                            "Cl_e": "135",
+#                            "phi_i": "-0.08465895949780111",
+#                            "phi_e": "0.0"}
+
 
 class ModelBase():
     """ Modeling electrodiffusive, osmotic, and hydrostatic
@@ -25,7 +36,7 @@ class ModelBase():
         self.t_PDE = t_PDE          # time constant
         self.N_ions = 3             # number of ions
         self.N_comparts = 2         # number of compartments
-        self.stim_protocol = None
+        self.stim_protocol = 'constant'
 
         return
 
@@ -65,8 +76,8 @@ class ModelBase():
         rho_pump = df.Constant(1.12e-6)    # max pump rate [mol/(m^2s)]
         P_Nai = df.Constant(10.0)          # pump threshold - Na_i [mol/m^3]
         P_Ke = df.Constant(1.5)            # pump threshold - K_e [mol/m^3]
-        # eta_m = df.Constant(8.14e-14)      # membrane water permeab. [m/(Pa*s)]
-        eta_m = df.Constant(0)  # membrane water permeab. [m/(Pa*s)]
+        eta_m = df.Constant(8.14e-14)      # membrane water permeab. [m/(Pa*s)]
+        # eta_m = df.Constant(0)  # membrane water permeab. [m/(Pa*s)]
 
         # compartmental fluid flow parameters
         kappa_i = df.Constant(1.8375e-14)  # ICS water permeability [m^4/(N*s)]

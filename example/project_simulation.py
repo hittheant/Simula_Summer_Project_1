@@ -25,7 +25,7 @@ def run_model(model_v, j_in, Tstop, stim_start, stim_end, stim_protocol):
     mesh = df.IntervalMesh(N, 0, L)          # create mesh
 
     # time variables
-    dt_value = 1e-2                          # time step (s)
+    dt_value = 1e-3                          # time step (s)
 
     # model setup
     t_PDE = df.Constant(0.0)  # time constant
@@ -72,4 +72,4 @@ if __name__ == '__main__':
 
     # plot figures
     P.timeplot(path_figs, model_v, Tstop)
-    P.spaceplot(path_figs, model_v, stim_end)
+    P.spaceplot(path_figs, model_v, Tstop)
