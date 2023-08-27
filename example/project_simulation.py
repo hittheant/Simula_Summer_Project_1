@@ -52,7 +52,7 @@ def run_model(model_v, j_in, Tstop, stim_start, stim_end, stim_protocol):
 
 
 if __name__ == '__main__':
-    model_v = "MC3"              # Model (hypothesis) number
+    model_v = "MC5"              # Model (hypothesis) number
     j_in = 1.0e-6                # input constant (mol/(m^2s))
     Tstop = 60                   # duration of simulation (s)
     stim_start = 10              # stimulus onset (s)
@@ -72,4 +72,4 @@ if __name__ == '__main__':
 
     # plot figures
     P.timeplot(path_figs, model_v, Tstop)
-    P.spaceplot(path_figs, model_v, Tstop)
+    P.spaceplot(path_figs, model_v, stim_end)
