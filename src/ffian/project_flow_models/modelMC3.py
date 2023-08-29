@@ -6,15 +6,15 @@ from .model_base import ModelBase
 #                            "HCO3_e": "8.5"}
 default_init_parameters = {"alpha_i": "0.4",
                            "alpha_e": "0.2",
-                           "Na_i": "15.510185113668564",
-                           "K_i": "99.18951810235991",
-                           "Cl_i": "5.064059582797311",
-                           "HCO3_i": "8.415729973700852",
-                           "Na_e": "146.58042154841118",
-                           "K_e": "3.02017201953078",
-                           "Cl_e": "133.87188083440577",
-                           "HCO3_e": "14.06854005259834",
-                           "phi_i": "-0.08465895949780111",
+                           "Na_i": "15.510093300460724",
+                           "K_i": "99.18947847754502",
+                           "Cl_i": "5.064065587554589",
+                           "HCO3_i": "8.415592530920843",
+                           "Na_e": "146.5806065705811",
+                           "K_e": "3.020249873406306",
+                           "Cl_e": "133.87186882489124",
+                           "HCO3_e": "14.068814938158356",
+                           "phi_i": "-0.08465771597442517",
                            "phi_e": "0.0"}
 
 class ModelMC3(ModelBase):
@@ -37,9 +37,12 @@ class ModelMC3(ModelBase):
     def set_parameters(self):
         ModelBase.set_parameters(self)
 
+        z_0 = self.params['z'][3]
         z_NBC = df.Constant(-1.0)
         z_HCO3 = df.Constant(-1.0)
-        self.params['z'].extend([z_NBC, z_HCO3])
+        self.params['z'][3] = z_HCO3
+        self.params['z'].extend([z_0])
+        self.params['z_NBC'] = z_NBC
         """ Set the model's physical parameters """
 
         g_NBC = df.Constant(7.6e-1)
@@ -59,8 +62,8 @@ class ModelMC3(ModelBase):
         z_Na = self.params['z'][0]
         z_K = self.params['z'][1]
         z_Cl = self.params['z'][2]
-        z_0 = self.params['z'][3]
-        z_HCO3 = self.params['z'][5]
+        z_HCO3 = self.params['z'][3]
+        z_0 = self.params['z'][4]
         p_m_init = float(self.params['p_m_init'])
 
         # get initial conditions
@@ -84,8 +87,7 @@ class ModelMC3(ModelBase):
         a_i = - (Na_i*z_Na + K_i*z_K + Cl_i*z_Cl + HCO3_i*z_HCO3) * alpha_i / z_0
 
         # set valence of immobile ions
-        self.params['z'][3] = df.Constant(z_0)
-
+        self.params['z'][4] = df.Constant(z_0)
         # set amount of immobile ions (mol/m^3)
         a = [a_i, a_e]
         self.params['a'] = a
@@ -184,7 +186,7 @@ class ModelMC3(ModelBase):
         z_Na = self.params['z'][0]
         z_K = self.params['z'][1]
         z_Cl = self.params['z'][2]
-        z_NBC = self.params['z'][4]
+        z_NBC = self.params['z_NBC']
 
         g_Na = self.params['g_Na']
         g_K = self.params['g_K']
@@ -203,7 +205,7 @@ class ModelMC3(ModelBase):
         E_Na = R*temperature/(F*z_Na)*df.ln(Na_e/Na_i)  # sodium    - (V)
         E_K = R*temperature/(F*z_K)*df.ln(K_e/K_i)      # potassium - (V)
         E_Cl = R*temperature/(F*z_Cl)*df.ln(Cl_e/Cl_i)  # chloride  - (V)
-        E_NBC = R*temperature/(F*z_NBC)*df.ln((Na_e*HCO3_e**2)/(Na_i*HCO3_i**2))
+        E_NBC = R*temperature/(F*z_NBC)*df.ln((Na_e*(HCO3_e**2))/(Na_i*(HCO3_i**2)))
 
         # phi_m = (g_Na*E_Na + g_K*E_K + g_Cl*E_Cl + g_NBC*E_NBC - j_NaKATPase*F)/(g_Na + g_K + g_Cl + g_NBC)
 
@@ -215,10 +217,10 @@ class ModelMC3(ModelBase):
         j_NBC = self.j_NBC(phi_m, E_NBC)
 
         # total transmembrane ion fluxes
-        j_Na = j_leak_Na + 3.0*j_pump - j_NBC           # sodium    - (mol/(m^2s))
+        j_Na = j_leak_Na + 3.0*j_pump + j_NBC           # sodium    - (mol/(m^2s))
         j_K = j_leak_K - 2.0*j_pump                # potassium - (mol/(m^2s))
         j_Cl = j_leak_Cl                        # chloride  - (mol/(m^2s))
-        j_HCO3 = -2.0 * j_NBC
+        j_HCO3 = 2.0 * j_NBC
 
         j_m = [j_Na, j_K, j_Cl, j_HCO3]
 
@@ -231,8 +233,9 @@ class ModelMC3(ModelBase):
         # get parameters
         F = self.params['F']
         g_NBC = self.params['g_NBC']
+        z_NBC = self.params['z_NBC']
 
         # set conductance
-        j_NBC = g_NBC/F*(phi_m - E_NBC)
+        j_NBC = g_NBC * (phi_m - E_NBC) / (F * z_NBC)
 
         return j_NBC
