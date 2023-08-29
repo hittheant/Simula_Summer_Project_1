@@ -5,15 +5,15 @@ from .model_base import ModelBase
 #                            "HCO3_e": "8.5"}
 default_init_parameters = {"alpha_i": "0.4",
                            "alpha_e": "0.2",
-                           "Na_i": "14.87300553875754",
-                           "K_i": "98.52058137376909",
-                           "Cl_i": "3.691074762079237",
-                           "HCO3_i": "8.525951129098365",
-                           "Na_e": "149.1734519269821",
-                           "K_e": "3.0393742479594863",
-                           "Cl_e": "136.61785047584263",
-                           "HCO3_e": "13.84809774180351",
-                           "phi_i": "-0.08468467162025574",
+                           "Na_i": "14.873097896755867",
+                           "K_i": "98.52044712996694",
+                           "Cl_i": "3.6910413660406522",
+                           "HCO3_i": "8.52594263933312",
+                           "Na_e": "149.17327134716948",
+                           "K_e": "3.039545331969974",
+                           "Cl_e": "136.6179172679198",
+                           "HCO3_e": "13.848114721334",
+                           "phi_i": "-0.08468340395057906",
                            "phi_e": "0.0"}
 
 
@@ -39,7 +39,10 @@ class ModelMC5(ModelBase):
 
         z_NBC = df.Constant(-1.0)
         z_HCO3 = df.Constant(-1.0)
-        self.params['z'].extend([z_NBC, z_HCO3])
+        z_0 = self.params['z'][3]
+        self.params['z'][3] = z_HCO3
+        self.params['z'].extend([z_0])
+        self.params['z_NBC'] = z_NBC
         """ Set the model's physical parameters """
 
         g_NBC = df.Constant(7.6e-1)
@@ -61,8 +64,8 @@ class ModelMC5(ModelBase):
         z_Na = self.params['z'][0]
         z_K = self.params['z'][1]
         z_Cl = self.params['z'][2]
-        z_0 = self.params['z'][3]
-        z_HCO3 = self.params['z'][5]
+        z_0 = self.params['z'][4]
+        z_HCO3 = self.params['z'][3]
         p_m_init = float(self.params['p_m_init'])
 
         # get initial conditions
@@ -86,7 +89,7 @@ class ModelMC5(ModelBase):
         a_i = - (Na_i*z_Na + K_i*z_K + Cl_i*z_Cl + HCO3_i*z_HCO3) * alpha_i / z_0
 
         # set valence of immobile ions
-        self.params['z'][3] = df.Constant(z_0)
+        self.params['z'][4] = df.Constant(z_0)
 
         # set amount of immobile ions (mol/m^3)
         a = [a_i, a_e]
@@ -184,7 +187,7 @@ class ModelMC5(ModelBase):
         z_Na = self.params['z'][0]
         z_K = self.params['z'][1]
         z_Cl = self.params['z'][2]
-        z_NBC = self.params['z'][4]
+        z_NBC = self.params['z_NBC']
 
         g_Na = self.params['g_Na']
         g_K = self.params['g_K']
