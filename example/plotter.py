@@ -220,15 +220,15 @@ class Plotter():
         fig = plt.figure(figsize=(11*fs, 15*fs))
         ax = plt.gca()
 
-        ax1 = fig.add_subplot(4, 2, 1, xlim=xlim_T, ylim=[-0.25, 1.25])
+        ax1 = fig.add_subplot(4, 2, 1, xlim=xlim_T, ylim=[-15, 15])
         plt.ylabel(r'$j\mathrm{^K_{input}}$($\mu$mol/(m$^2$s))', fontsize=fosi)
         plt.plot(j_ins, color='k', linestyle='dotted', linewidth=lw)
 
-        ax2 = fig.add_subplot(4, 2, 2, xlim=xlim_T, ylim=[-0.25, 1.25])
+        ax2 = fig.add_subplot(4, 2, 2, xlim=xlim_T, ylim=[-15, 15])
         plt.ylabel(r'$j\mathrm{^K_{decay}}$($\mu$mol/(m$^2$s))', fontsize=fosi)
         plt.plot(j_decs, color='k', linewidth=lw)
 
-        ax3 = fig.add_subplot(4, 2, 3, xlim=xlim_T, ylim=[-15, 10])
+        ax3 = fig.add_subplot(4, 2, 3, xlim=xlim_T, ylim=[-15, 15])
         plt.ylabel(r'$\Delta [k]_\mathrm{e}$ (mM)', fontsize=fosi)
         plt.plot(np.array(Na_es)-Na_es[0], color=b0, label=r'Na$^+$', linewidth=lw)
         plt.plot(np.array(K_es)-K_es[0], color=b1, label=r'K$^+$', linestyle='dotted', linewidth=lw)
@@ -262,7 +262,7 @@ class Plotter():
         plt.plot(phi_ms, color=c1, linewidth=lw)
         plt.xlabel(r'time (s)', fontsize=fosi)
 
-        plt.figlegend(bbox_to_anchor=(0.49, 0.63), frameon=True)
+        plt.figlegend(bbox_to_anchor=(0.49, 0.68), frameon=True)
 
         axes = [ax1, ax2, ax3, ax4, ax5, ax6, ax7, ax8]
 
@@ -280,9 +280,8 @@ class Plotter():
             ax.spines['right'].set_visible(False)
             ax.spines['top'].set_visible(False)
 
-        # obj0, obj1, obj2 are created here...
-
         # Saving the objects:
+
         fname_pickled_data = 'results/stimulation_data/timedata/' + model_v + '.pkl'
         dump_list = [j_ins, j_decs, dalpha_is, dalpha_es,
                      Na_is, Na_es, K_is, K_es, Cl_is, Cl_es]
@@ -379,12 +378,12 @@ class Plotter():
         fig = plt.figure(figsize=(11*fs, 15*fs))
         ax = plt.gca()
 
-        ax1 = fig.add_subplot(4, 2, 1, xlim=xlim, ylim=[-0.25, 1.25])
+        ax1 = fig.add_subplot(4, 2, 1, xlim=xlim, ylim=[-15, 15])
         plt.xticks(xticks, xticklabels)
         plt.ylabel(r'$j\mathrm{^K_{input}}$($\mu$mol/(m$^2$s))', fontsize=fosi)
         df.plot(j_in, color='k', linestyle='dotted', linewidth=lw)
 
-        ax2 = fig.add_subplot(4, 2, 2, xlim=xlim, ylim=[-0.25, 1.25])
+        ax2 = fig.add_subplot(4, 2, 2, xlim=xlim, ylim=[-15, 15])
         plt.xticks(xticks, xticklabels)
         plt.ylabel(r'$j\mathrm{^K_{decay}}$($\mu$mol/(m$^2$s))', fontsize=fosi)
         df.plot(j_dec, color='k', linewidth=lw)
@@ -429,7 +428,7 @@ class Plotter():
         df.plot(phi_m, color=c1, linewidth=lw)
         plt.xlabel(xlabel_x, fontsize=fosi)
 
-        plt.figlegend(bbox_to_anchor=(0.26, 0.76), frameon=True)
+        plt.figlegend(bbox_to_anchor=(0.49, 0.67), frameon=True)
 
         axes = [ax1, ax2, ax3, ax4, ax5, ax6, ax7, ax8]
 
@@ -463,4 +462,90 @@ class Plotter():
         # with open(fname_pickled_data, 'wb') as f:  # Python 3: open(..., 'wb')
         #     pickle.dump(dump_list, f)
         print("end")
+        return
+
+    def plot_fluid_velocities(self, path_figs, n):
+        """ plot fluid velocities at t=n """
+
+        # get parameters
+        temperature = self.model.params['temperature']
+        R = self.model.params['R']
+        a_i = self.model.params['a'][0]
+        kappa = self.model.params['kappa']
+        eps_r = self.model.params['eps_r']
+        eps_zero = self.model.params['eps_zero']
+        zeta = self.model.params['zeta']
+        mu = self.model.params['mu']
+        K_m = self.model.params['K_m']
+        p_m_init = self.model.params['p_m_init']
+
+        # create plot
+        fig = plt.figure(figsize=(10, 5))
+        ax = plt.gca()
+
+        alpha_i = self.read_from_file(n, 0)
+        phi_e = self.read_from_file(n, 8)
+        p_e = self.read_from_file(n, 9)
+
+        # extracellular volume fraction
+        alpha_e = 0.6 - alpha_i
+
+        # intracellular hydrostatic pressure
+        tau = K_m*(alpha_i - float(self.model.alpha_i_init))
+        p_i = p_e + tau + p_m_init
+
+        # ICS fluid velocities
+        u_i_hyd_ = - kappa[0]*df.grad(p_i)
+        u_i_osm_ = kappa[0]*R*temperature*df.grad(a_i/alpha_i)
+        u_i_tot_ = u_i_hyd_[0] + u_i_osm_[0]
+
+        # ECS fluid velocities
+        u_e_hyd_ = - kappa[1]*df.grad(p_e)
+        u_e_eof_ = - eps_r*eps_zero*zeta*df.grad(phi_e)/mu
+        u_e_tot_ = u_e_hyd_[0] + u_e_eof_[0]
+
+        # project to function space
+        u_i_hyd = self.project_to_function_space(alpha_i*u_i_hyd_[0]*1.0e6*60)  # convert to um/min
+        u_i_osm = self.project_to_function_space(alpha_i*u_i_osm_[0]*1.0e6*60)
+        u_i_tot = self.project_to_function_space(alpha_i*u_i_tot_*1.0e6*60)
+        u_e_hyd = self.project_to_function_space(alpha_e*u_e_hyd_[0]*1.0e6*60)
+        u_e_eof = self.project_to_function_space(alpha_e*u_e_eof_[0]*1.0e6*60)
+        u_e_tot = self.project_to_function_space(alpha_e*u_e_tot_*1.0e6*60)
+
+        ax3 = fig.add_subplot(1, 2, 1, xlim=xlim)#, ylim=[-90, 90])
+        plt.ylabel(r'$\alpha_\mathrm{i} u_\mathrm{i}$ ($\mu$m/min)', fontsize=fosi)
+        plt.xlabel(xlabel_x, fontsize=fosi)
+        plt.xticks(xticks, xticklabels)
+        df.plot(u_i_osm, color=c5, label='osmotic', linewidth=lw)
+        df.plot(u_i_hyd, color=c3, linewidth=lw)
+        df.plot(u_i_tot, color='k', linewidth=lw)
+
+        ax4 = fig.add_subplot(1, 2, 2, xlim=xlim)#, ylim=[-90, 90])
+        plt.ylabel(r'$\alpha_\mathrm{e} u_\mathrm{e}$ ($\mu$m/min)', fontsize=fosi)
+        plt.xlabel(xlabel_x, fontsize=fosi)
+        plt.xticks(xticks, xticklabels)
+        df.plot(u_e_hyd, label='hydrostatic', color=c3, linewidth=lw)
+        df.plot(u_e_eof, label='electro-osmotic', color=c4, linewidth=lw)
+        df.plot(u_e_tot, label='total', color='k', linewidth=lw)
+
+        plt.figlegend(bbox_to_anchor=(0.98, 0.94))
+
+        # make pretty
+        ax.axis('off')
+        plt.tight_layout()
+        plt.subplots_adjust(top=0.95)
+
+        # add numbering for the subplots (A, B, C etc)
+        letters = [r'\textbf{A}', r'\textbf{B}', r'\textbf{C}', r'\textbf{D}']
+        for num, ax in enumerate([ax3, ax4]):
+            ax.text(-0.2, 1.0, letters[num], transform=ax.transAxes, size=22, weight='bold')
+            # make pretty
+            ax.spines['right'].set_visible(False)
+            ax.spines['top'].set_visible(False)
+
+        # save figure to file
+        fname_res = path_figs + 'watervelocity_' + self.model.model_v
+        plt.savefig(fname_res + '.pdf', format='pdf')
+        plt.close()
+
         return

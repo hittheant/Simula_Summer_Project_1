@@ -73,3 +73,4 @@ if __name__ == '__main__':
     # plot figures
     P.timeplot(path_figs, model_v, Tstop)
     P.spaceplot(path_figs, model_v, stim_end)
+    P.plot_fluid_velocities(path_figs, stim_end)

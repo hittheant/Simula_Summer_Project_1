@@ -82,7 +82,7 @@ class ModelMC3(ModelBase):
         # calculate valence and amount of immobile ions
         z_0 = (Na_e*z_Na + K_e*z_K + Cl_e*z_Cl + HCO3_e*z_HCO3 - Na_i*z_Na -
                K_i*z_K - Cl_i*z_Cl - HCO3_i*z_HCO3) / (p_m_init/(R*T) + Na_e
-                                       + K_e + Cl_e + HCO3_e - Na_i - K_i - Cl_i - HCO3_e)
+                                       + K_e + Cl_e + HCO3_e - Na_i - K_i - Cl_i - HCO3_i)
         a_e = - (Na_e*z_Na + K_e*z_K + Cl_e*z_Cl + HCO3_e*z_HCO3) * alpha_e / z_0
         a_i = - (Na_i*z_Na + K_i*z_K + Cl_i*z_Cl + HCO3_i*z_HCO3) * alpha_i / z_0
 
