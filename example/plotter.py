@@ -228,7 +228,7 @@ class Plotter():
         plt.ylabel(r'$j\mathrm{^K_{decay}}$($\mu$mol/(m$^2$s))', fontsize=fosi)
         plt.plot(j_decs, color='k', linewidth=lw)
 
-        ax3 = fig.add_subplot(4, 2, 3, xlim=xlim_T, ylim=[-15, 15])
+        ax3 = fig.add_subplot(4, 2, 3, xlim=xlim_T, ylim=[-35, 15])
         plt.ylabel(r'$\Delta [k]_\mathrm{e}$ (mM)', fontsize=fosi)
         plt.plot(np.array(Na_es)-Na_es[0], color=b0, label=r'Na$^+$', linewidth=lw)
         plt.plot(np.array(K_es)-K_es[0], color=b1, label=r'K$^+$', linestyle='dotted', linewidth=lw)
