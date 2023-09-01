@@ -1,8 +1,10 @@
 import dolfin as df
 import os
+import inspect
 
 # set path to solver
-from ffian import project_flow_models
+from ffian.project_flow_models import ModelMC1, ModelMC2, ModelMC3, ModelMC4, \
+    ModelMC5, ModelMC6, ModelMC7, Solver
 from plotter import Plotter
 
 
@@ -26,13 +28,15 @@ def run_model(model_v, j_in, Tstop, stim_start, stim_end, stim_protocol):
     dt_value = 1e-3                          # time step (s)
 
     # model setup
-    t_PDE = df.Constant(0.0)                 # time constant
-    if model_v == "M0":
-        model = zero_flow_model.Model(
-            mesh, L, t_PDE, j_in, stim_start, stim_end)
+    t_PDE = df.Constant(0.0)  # time constant
+
+    # model initialization
+    class_name = f"Model{model_v}"
+    if class_name in globals() and inspect.isclass(globals()[class_name]):
+        model_type = globals()[class_name]
+        model = model_type(model_v, mesh, L, t_PDE, j_in, stim_start, stim_end, stim_protocol)
     else:
-        model = flow_model.Model(
-            model_v, mesh, L, t_PDE, j_in, stim_start, stim_end, stim_protocol)
+        raise Exception("Invalid model version")
 
     # check that directory for results (data) exists, if not create
     path_data = 'results/data/' + model_v + '/'
@@ -40,11 +44,7 @@ def run_model(model_v, j_in, Tstop, stim_start, stim_end, stim_protocol):
     if not os.path.isdir(path_data):
         os.makedirs(path_data)
 
-    # solve system
-    if model_v == "M0":
-        S = zero_flow_model.Solver(model, dt_value, Tstop)
-    else:
-        S = flow_model.Solver(model, dt_value, Tstop)
+    S = Solver(model, dt_value, Tstop)
 
     S.solve_system(path_results=path_data)
 
@@ -52,13 +52,12 @@ def run_model(model_v, j_in, Tstop, stim_start, stim_end, stim_protocol):
 
 
 if __name__ == '__main__':
-
-    model_v = 'M3'              # model version ('M1', 'M2', 'M3', or 'M0')
-    j_in = 1.0e-6               # input constant (mol/(m^2s))
-    Tstop = 30                  # duration of simulation (s)
-    stim_start = 10             # stimulus onset (s)
-    stim_end = 20               # stimulus offset (s)
-    stim_protocol = 'constant'  # stimulues protocol ('constant', 'slow', or 'ultraslow')
+    model_v = "MC5"              # Model (hypothesis) number
+    j_in = 1.0e-6                # input constant (mol/(m^2s))
+    Tstop = 60                   # duration of simulation (s)
+    stim_start = 10              # stimulus onset (s)
+    stim_end = 20                # stimulus offset (s)
+    stim_protocol = 'constant'   # stimulus protocol ('constant', 'slow', or 'ultraslow')
 
     # run model
     model, path_data = run_model(model_v, j_in, Tstop, stim_start, stim_end, stim_protocol)
@@ -74,3 +73,4 @@ if __name__ == '__main__':
     # plot figures
     P.timeplot(path_figs, model_v, Tstop)
     P.spaceplot(path_figs, model_v, stim_end)
+    P.plot_fluid_velocities(path_figs, stim_end)

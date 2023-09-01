@@ -56,7 +56,7 @@ if __name__ == '__main__':
 
     model_v = 'M3'              # model version ('M1', 'M2', 'M3', or 'M0')
     j_in = 1.0e-6               # input constant (mol/(m^2s))
-    Tstop = 30                  # duration of simulation (s)
+    Tstop = 5                  # duration of simulation (s)
     stim_start = 10             # stimulus onset (s)
     stim_end = 20               # stimulus offset (s)
     stim_protocol = 'constant'  # stimulues protocol ('constant', 'slow', or 'ultraslow')
@@ -74,4 +74,4 @@ if __name__ == '__main__':
 
     # plot figures
     P.timeplot(path_figs, model_v, Tstop)
-    P.spaceplot(path_figs, model_v, stim_end)
+    P.spaceplot(path_figs, model_v, Tstop)

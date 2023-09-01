@@ -155,22 +155,11 @@ class Solver():
         tau = K_m*(alpha_i - alpha_i_init)
         p_i = p_e + tau + p_m_init
 
-        # intra- and extracellular fluid velocities
-        if self.model.model_v == 'M1':
-            u_i = - kappa[0]*(df.grad(p_i))
-            u_e = - kappa[1]*df.grad(p_e)
-        elif self.model.model_v == 'M2':
-            u_i = - kappa[0]*(df.grad(p_i)
-                    - R*temperature*df.grad(a_i/alpha_i))
-            u_e = - kappa[1]*df.grad(p_e)
-        elif self.model.model_v == 'M3':
-            u_i = - kappa[0]*(df.grad(p_i)
-                    - R*temperature*df.grad(a_i/alpha_i))
-            u_e = - kappa[1]*df.grad(p_e) \
-                    - eps_r*eps_zero*zeta*df.grad(phi_e)/mu
-        else:
-            print('model_v must be "M1", "M2", or "M3"')
-            sys.exit(0)
+        # Intra and extra-cellular fluid velocities
+        u_i = - kappa[0]*(df.grad(p_i)
+                          - R*temperature*df.grad(a_i/alpha_i))
+        u_e = - kappa[1]*df.grad(p_e) \
+              - eps_r*eps_zero*zeta*df.grad(phi_e)/mu
 
         # add contribution from ICS fluid velocity to form for ECS pressure
         A_p_e += - df.inner(alpha_i*u_i, df.grad(v_p_e))*df.dx
@@ -238,6 +227,9 @@ class Solver():
 
         # transmembrane water flux
         w_m = eta_m*w_m
+
+        if self.model.model_v == 'MC6':
+            w_m += self.model.water_active_transport_flux
 
         # form for ICS volume fraction
         A_alpha_i += 1.0/self.dt*df.inner(alpha_i - alpha_i_, v_alpha_i)*df.dx \
